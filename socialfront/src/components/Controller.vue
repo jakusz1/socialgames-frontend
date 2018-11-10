@@ -1,0 +1,146 @@
+<template>
+  <div class="container">
+        <div v-if="sessionStarted">
+          <div v-if="mode == 'blank'" class="card-body">
+          </div>
+
+          <div v-else-if="mode == 'text'" class="card-body">
+            <div class="card-header">{{ title }}</div>
+            <div class="card-footer">
+            <form @submit.prevent="postMessage">
+                  <input :maxlength="20" v-model="message" type="text" :placeholder="$t('type.ans')" class="p-2 w-100" />
+                  <button class="btn btn-outline-secondary w-100 m-2">{{$t('send')}}: {{message}}</button>
+            </form>
+            </div>
+          </div>
+
+          <div v-else-if="mode == 'textLR'" class="card-body">
+            <div class="card-header">{{ title }}</div>
+            <div class="card-footer">
+            <form @submit.prevent="postMessage">
+                  <input :maxlength="20" v-model="message" type="text" :placeholder="$t('type.ans')" class="p-2 w-100" />
+                  <button class="btn btn-outline-secondary m-2">{{$t('send')}}: {{message}} {{title}}</button>
+                  <button class="btn btn-outline-secondary m-2">{{$t('send')}}: {{title}} {{message}}</button>
+            </form>
+            </div>
+          </div>
+
+          <div v-else-if="mode == 'choiceText'" class="card-body">
+            <div class="card-header">{{ title }}</div>
+            <div class="card-footer">
+              <div v-for="choice in choices" :key="choice.id">
+                <button class="btn btn-outline-secondary w-100 m-2 p-2" v-on:click="postChoice(choice.id)">{{choice.text}}</button>
+              </div>
+            </div>
+          </div>
+        </div>
+  </div>
+</template>
+
+<script>
+const $ = window.jQuery
+
+export default {
+  data () {
+    return {
+      sessionStarted: false,
+      mode: 'choiceText',
+      messages: [],
+      title: '',
+      message: '',
+      gameType: '',
+      choices: [{'id': 'heh', 'text': 'Sample answer number one'},
+        {'id': 'heh2', 'text': 'Sample answer number two'}]
+    }
+  },
+
+  created () {
+    this.username = sessionStorage.getItem('username')
+
+    // Setup headers for all requests
+    $.ajaxSetup({
+      headers: {
+        'Authorization': `Token ${sessionStorage.getItem('authToken')}`
+      }
+    })
+    if (this.$route.params.uri) {
+      this.joinGameSession()
+      this.connectToWebSocket()
+    }
+  },
+
+  methods: {
+    postMessage (event) {
+      const data = {message: this.message}
+
+      $.post(`http://localhost:8000/api/games/${this.$route.params.uri}/messages/`, data, (data) => {
+        this.message = '' // clear the message after sending
+      })
+        .fail((response) => {
+          alert(response.responseText)
+        })
+    },
+    postChoice (choice) {
+      const data = {message: choice}
+
+      $.post(`http://localhost:8000/api/games/${this.$route.params.uri}/messages/`, data, (data) => {
+        this.mode = 'blank'
+      })
+        .fail((response) => {
+          alert(response.responseText)
+        })
+    },
+    joinGameSession () {
+      const uri = this.$route.params.uri
+
+      $.ajax({
+        url: `http://localhost:8000/api/games/${uri}/`,
+        data: {username: this.username},
+        type: 'PATCH',
+        success: (data) => {
+          const user = data.players.find((player) => player.username === this.username)
+          if (user) {
+            // The user belongs/has joined the session
+            this.sessionStarted = true
+            // this.fetchGameSessionHistory()
+          }
+        }
+      })
+    },
+
+    connectToWebSocket () {
+      const websocket = new WebSocket(`ws://localhost:8000/ws/controllers/${this.$route.params.uri}`)
+      websocket.onopen = this.onOpen
+      websocket.onclose = this.onClose
+      websocket.onmessage = this.onMessage
+      websocket.onerror = this.onError
+    },
+
+    onOpen (event) {
+      console.log('Connection opened.', event.data)
+    },
+
+    onClose (event) {
+      console.log('Connection closed.', event.data)
+
+      // Try and Reconnect after five seconds
+      setTimeout(this.connectToWebSocket, 5000)
+    },
+
+    onMessage (event) {
+      // const message = JSON.parse(event.data)
+      // debugger
+      // this.messages.push(message)
+    },
+
+    onError (event) {
+      alert('An error occured:', event.data)
+    }
+  }
+}
+</script>
+
+<!-- Add "scoped" attribute to limit CSS to this component only -->
+<style scoped>
+
+</style>

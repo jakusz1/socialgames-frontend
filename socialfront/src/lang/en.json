@@ -1,0 +1,21 @@
+{
+    "app":{
+        "name":"SocialGames"
+    },
+    "sign":{
+        "up":"Sign up"
+    },
+    "log":{
+        "in":"Log in",
+        "out":"Log out"
+    },
+    "type":{
+        "ans":"Type your answer"
+    },
+    "username":"Username",
+    "password":"Password",
+    "email":"Email",
+    "send":"Send",
+    "hello":"Hello",
+    "_code":"code"
+}
