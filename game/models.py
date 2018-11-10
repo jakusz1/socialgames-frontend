@@ -53,6 +53,13 @@ class GameSession(models.Model):
     lang = models.CharField(max_length=2, choices=Lang.choices(), default=Lang.EN)
     started = models.BooleanField(default=False)
 
+    def to_json(self):
+        return {'id': self.id,
+                'game_type': self.game_type,
+                'lang': self.lang,
+                'started': self.started,
+                'players': [deserialize_player(player) for player in self.players.all()]}
+
 
 class GameSessionPlayer(models.Model):
     """Store all users in a game session."""

@@ -12,6 +12,12 @@
     "type":{
         "ans":"Type your answer"
     },
+    "start":{
+        "game":"Start game"
+    },
+    "waiting":{
+        "title":"Waiting for game to start"
+    },
     "username":"Username",
     "password":"Password",
     "email":"Email",

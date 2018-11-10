@@ -44,6 +44,14 @@ class GameSessionConsumer(JsonWebsocketConsumer):
     def start_game(self, content):
         services.start_game(content['game'])
 
+    def out_of_time(self, content):
+        async_to_sync(self.channel_layer.group_send)(
+            self.__get_uri() + GAME_SETTINGS['controller_postfix'],
+            {
+                "type": "broadcast",
+                "response": {"command": "out_of_time"}
+            })
+
     def disconnect(self, code):
         async_to_sync(self.channel_layer.group_discard)(
             self.__get_uri(),

@@ -6,17 +6,33 @@ from .models import GameSession, GameSessionPlayer, deserialize_player, GameSess
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import permissions
-from channels.layers import get_channel_layer
-from asgiref.sync import async_to_sync
 
 import game.services as services
 
 
-def __send(uri, data, to_controllers=False):
-    channel_layer = get_channel_layer()
-    if to_controllers:
-        uri = uri + GAME_SETTINGS['controller_postfix']
-    async_to_sync(channel_layer.group_send)(uri, {"type": "broadcast", "response": data})
+class GameStartView(APIView):
+    def patch(self, request, *args, **kwargs):
+        User = get_user_model()
+
+        uri = kwargs['uri']
+        username = request.data['username']
+        user = User.objects.get(username=username)
+        game_session = GameSession.objects.get(uri=uri)
+        player = game_session.players.filter(user=user, game_session=game_session)
+        if game_session.started or not player.exists():
+            return Response({
+                'status': 'ERROR',
+                'message': 'Game was already started'
+            })
+        else:
+            game_session.started = True
+            game_session.save()
+        services.send(uri, 'start_game', game_session.to_json())
+        return Response({
+            'status': 'SUCCESS',
+            'message': '%s started game' % user.username,
+            'game': game_session.to_json()
+        })
 
 
 class GameSessionView(APIView):
@@ -51,62 +67,20 @@ class GameSessionView(APIView):
         username = request.data['username']
         user = User.objects.get(username=username)
         game_session = GameSession.objects.get(uri=uri)
-
-        game_session.players.get_or_create(user=user, game_session=game_session)
-
-        players = [deserialize_player(player) for player in game_session.players.all()]
+        player = game_session.players.filter(user=user, game_session=game_session)
+        if game_session.started and not player.exists():
+            return Response({
+                'status': 'ERROR',
+                'message': 'Game was already started'
+            })
+        else:
+            game_session.players.get_or_create(user=user, game_session=game_session)
 
         return Response({
-            'status': 'SUCCESS', 'players': players,
-            'message': '%s joined game' % user.username
+            'status': 'SUCCESS',
+            'message': '%s joined game' % user.username,
+            'game': game_session.to_json()
         })
-
-
-# class GameSessionMessageView(APIView):
-#     """Create/Get Game session messages."""
-#
-#     permission_classes = (permissions.IsAuthenticated,)
-#
-#     def get(self, request, *args, **kwargs):
-#         """return all messages in a game session."""
-#         uri = kwargs['uri']
-#
-#         game_session = GameSession.objects.get(uri=uri)
-#         messages = [game_session_message.to_json()
-#                     for game_session_message in game_session.messages.all()]
-#
-#         return Response({
-#             'id': game_session.id, 'uri': game_session.uri,
-#             'messages': messages
-#         })
-#
-#     def post(self, request, *args, **kwargs):
-#         """create a new message in a game session."""
-#         uri = kwargs['uri']
-#         message = request.data['message']
-#
-#         user = request.user
-#         game_session = GameSession.objects.get(uri=uri)
-#
-#         game_session_message = GameSessionMessage.objects.create(user=user, game_session=game_session, message=message)
-#
-#         response = {'id': game_session_message.id, 'message': ("GAME: " + message),
-#                     'user': {'username': user.username}}
-#
-#         response2 = {'id': game_session_message.id, 'message': ("CONTR: " + message),
-#                      'user': {'username': user.username}}
-#
-#         channel_layer = get_channel_layer()
-#         async_to_sync(channel_layer.group_send)(uri, {"type": "broadcast",
-#                                                       "response": response})
-#         async_to_sync(channel_layer.group_send)(uri + GAME_SETTINGS['controller_postfix'],
-#                                                 {"type": "broadcast",
-#                                                  "response": response2})
-#
-#         return Response({
-#             'status': 'SUCCESS', 'uri': game_session.uri, 'message': message,
-#             'user': deserialize_user(user)
-#         })
 
 
 class GameSessionTaskView(APIView):

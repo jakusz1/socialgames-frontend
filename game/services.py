@@ -7,13 +7,21 @@ from game.models import GameSessionTask, deserialize_player, Lang, GameSession, 
 from socialgames.settings import GAME_SETTINGS
 
 
-def _send(uri, data, only_screen=False, only_controllers=False):
+def send(uri, command, data, only_screen=False, only_controllers=False):
     channel_layer = get_channel_layer()
     if not only_controllers:
-        async_to_sync(channel_layer.group_send)(uri, {"type": "broadcast", "response": data})
+        async_to_sync(channel_layer.group_send)(uri, {"type": "broadcast",
+                                                      "response": {
+                                                          "command": command,
+                                                          "data": data
+                                                      }})
     if not only_screen:
         async_to_sync(channel_layer.group_send)(uri + GAME_SETTINGS['controller_postfix'],
-                                                {"type": "broadcast", "response": data})
+                                                {"type": "broadcast",
+                                                 "response": {
+                                                     "command": command,
+                                                     "data": data
+                                                 }})
 
 
 def start_game(game_session, *args):
@@ -39,7 +47,7 @@ def check_if_last_answer(game_task):
 def send_question(game_session):
     task = game_session.tasks.filter(done=False).first()
     if task:
-        _send(game_session.uri, task.to_json())
+        send(game_session.uri, 'new_task', task.to_json())
         task.done = True
         task.save()
         return True
@@ -52,7 +60,7 @@ def get_points(game_session):
     if task:
         answers_checklist = []
         players_list = []
-        for answer in task.answers:
+        for answer in task.answers.all():
             answers_checklist.append(answer.text)
             players_list.append(answer.player)
 
@@ -63,8 +71,8 @@ def get_points(game_session):
             players_list[i].score += scores[i]
             players_list[i].save()
 
-        _send(game_session.uri, {'graph': scrapped_df.to_json(orient='records'),
-                                 'players': [deserialize_player(p) for p in players_list]}, only_screen=True)
+        send(game_session.uri, 'results', {'graph': scrapped_df.to_json(orient='records'),
+                                           'players': [deserialize_player(p) for p in players_list]}, only_screen=True)
         task.delete()
         return True
     return False

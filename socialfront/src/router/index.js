@@ -29,10 +29,8 @@ const router = new Router({
 router.beforeEach((to, from, next) => {
   if (to.path === '/logout') {
     sessionStorage.removeItem('authToken')
-    debugger
     next('/auth')
   } else if (sessionStorage.getItem('authToken') !== null || to.path === '/auth') {
-    debugger
     next()
   } else {
     next('/auth')
