@@ -17,7 +17,11 @@
   "dependencies": {
     "vue": "^2.5.2",
     "vue-i18n": "^8.3.0",
-    "vue-router": "^3.0.1"
+    "vue-router": "^3.0.1",
+    "animate.css": "^3.7.0",
+    "chart.js": "2.7.3",
+    "eagle.js": "git+https://github.com/jakusz1/eagle.js.git",
+    "vue-chartjs": "3.4.0"
   },
   "devDependencies": {
     "autoprefixer": "^7.1.2",

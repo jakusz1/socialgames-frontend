@@ -1,8 +1,13 @@
 <template>
   <div class="container">
     <div v-if="sessionStarted">
-      <div v-if="mode == 'game'" class="card-body">
-        <div class="card-header"> Gierka </div>
+      <div class="row">
+        <div v-for="player in players" :key="player.id" class="col-sm">
+          {{player.username}} {{player.score}}
+        </div>
+      </div>
+      <div v-if="mode == 'game'">
+        <TrendsGame :embedded="true" :keyboardNavigation="false" :mouseNavigation="false"></TrendsGame>
       </div>
       <div v-else-if="mode == 'wait_for_start'" class="card-body">
         <div class="card-header">{{ $t('waiting.title') }}</div>
@@ -15,13 +20,18 @@
 </template>
 
 <script>
+import TrendsGame from './games/TrendsGame'
 const $ = window.jQuery
 
 export default {
+  components: {
+    TrendsGame
+  },
   data () {
     return {
       sessionStarted: false,
       mode: 'wait_for_start',
+      players: [],
       game: {}
     }
   },
@@ -46,6 +56,7 @@ export default {
         alert("A new session has been created you'll be redirected automatically")
         this.sessionStarted = true
         this.$router.push(`/games/${data.uri}/`)
+        this.joinGameSession()
       })
         .fail((response) => {
           alert(response.responseText)
@@ -71,6 +82,8 @@ export default {
         success: (data) => {
           const user = data.game.players.find((player) => player.username === this.username)
           this.game = data.game
+          debugger
+          this.players = data.game.players
           if (this.game.started) {
             this.mode = 'game'
           } else {
@@ -117,6 +130,10 @@ export default {
 
     start_game (data) {
       this.mode = data.started ? 'game' : 'wait_for_start'
+    },
+
+    new_player_joined (data) {
+      this.players = data.players
     },
 
     onError (event) {

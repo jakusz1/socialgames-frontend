@@ -75,7 +75,7 @@ class GameSessionView(APIView):
             })
         else:
             game_session.players.get_or_create(user=user, game_session=game_session)
-
+        services.send(uri, 'new_player_joined', game_session.to_json(), only_screen=True)
         return Response({
             'status': 'SUCCESS',
             'message': '%s joined game' % user.username,
