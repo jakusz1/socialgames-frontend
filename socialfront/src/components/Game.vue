@@ -7,7 +7,7 @@
         </div>
       </div>
       <div v-if="mode == 'game'">
-        <TrendsGame :embedded="true" :keyboardNavigation="false" :mouseNavigation="false"></TrendsGame>
+        <TrendsGame></TrendsGame>
       </div>
       <div v-else-if="mode == 'wait_for_start'" class="card-body">
         <div class="card-header">{{ $t('waiting.title') }}</div>
@@ -32,7 +32,8 @@ export default {
       sessionStarted: false,
       mode: 'wait_for_start',
       players: [],
-      game: {}
+      game: {},
+      kek: ''
     }
   },
 
@@ -71,6 +72,9 @@ export default {
         .fail((response) => {
           alert(response.responseText)
         })
+    },
+    testM () {
+      debugger
     },
     joinGameSession () {
       const uri = this.$route.params.uri
