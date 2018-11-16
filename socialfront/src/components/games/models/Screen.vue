@@ -1,5 +1,5 @@
 <template>
-  <div class="screen" v-if="active">
+  <div class="d-flex flex-grow-1 justify-content-center align-items-center" v-if="active">
     <slot></slot>
   </div>
 </template>
@@ -9,6 +9,7 @@ export default {
   name: 'Screen',
   props: {
     duration: {default: 0},
+    onStartFun: {default: () => function () { }},
     onEndFun: {default: () => function () { }}
   },
   data: function () {
@@ -25,6 +26,7 @@ export default {
     active: function (val) {
       var self = this
       if (val) {
+        this.onStartFun()
         this.screenTimer = 0
         this.timerUpdater = setInterval(function () {
           self.screenTimer++

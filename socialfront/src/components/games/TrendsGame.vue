@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="d-flex flex-grow-1">
     <Screen :duration="5">
       <h1>Ja pierdole</h1>
     </Screen>
@@ -31,5 +31,5 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 </style>

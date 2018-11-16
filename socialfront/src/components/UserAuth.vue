@@ -73,7 +73,11 @@ export default {
       $.post('http://localhost:8000/auth/token/create/', credentials, (data) => {
         sessionStorage.setItem('authToken', data.auth_token)
         sessionStorage.setItem('username', this.username)
-        this.$router.push('/games')
+        if (this.$route.query.from) {
+          this.$router.push(this.$route.query.from)
+        } else {
+          this.$router.push('/games')
+        }
       })
         .fail((response) => {
           alert(response.responseText)

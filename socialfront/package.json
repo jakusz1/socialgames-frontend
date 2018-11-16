@@ -17,7 +17,6 @@
   "dependencies": {
     "animate.css": "^3.7.0",
     "chart.js": "2.7.3",
-    "eagle.js": "git+https://github.com/jakusz1/eagle.js.git",
     "vue": "^2.5.2",
     "vue-chartjs": "3.4.0",
     "vue-i18n": "^8.3.1",

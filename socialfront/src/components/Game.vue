@@ -1,21 +1,19 @@
 <template>
-  <div class="container">
-    <div v-if="sessionStarted">
-      <div class="row">
-        <div v-for="player in players" :key="player.id" class="col-sm">
-          {{player.username}} {{player.score}}
-        </div>
-      </div>
-      <div v-if="mode == 'game'">
-        <TrendsGame></TrendsGame>
-      </div>
-      <div v-else-if="mode == 'wait_for_start'" class="card-body">
-        <div class="card-header">{{ $t('waiting.title') }}</div>
+  <div class="d-flex flex-column flex-grow-1" v-if="sessionStarted">
+    <div v-if="mode == 'game'" class="d-flex flex-grow-1">
+      <TrendsGame/>
+    </div>
+    <div v-else-if="mode == 'wait_for_start'" class="card-body">
+      <div class="card-header">{{ $t('waiting.title') }}</div>
+    </div>
+    <div class="row">
+      <div v-for="player in players" :key="player.id" class="col-sm">
+        {{player.username}} {{player.score}}
       </div>
     </div>
-    <div v-else>
-      <button @click="startGameSession" class="btn btn-primary btn-lg btn-block">{{$t('start.game')}}</button>
-    </div>
+  </div>
+  <div v-else>
+    <button @click="startGameSession" class="btn btn-primary btn-lg btn-block">{{$t('start.game')}}</button>
   </div>
 </template>
 
@@ -149,5 +147,4 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-
 </style>

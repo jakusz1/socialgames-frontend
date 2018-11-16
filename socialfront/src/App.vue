@@ -1,5 +1,5 @@
 <template>
-  <div id="app">
+  <div id="app" class="d-flex flex-column flex-grow-1">
     <nav class="navbar navbar-light bg-light">
       <a class="navbar-brand mr-auto" href="#">
         <img src="@/assets/logo.png" width="30" height="30" class="d-inline-block align-top" alt="">
@@ -33,5 +33,6 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
+  height: inherit;
 }
 </style>
