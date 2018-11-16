@@ -20,7 +20,7 @@
 </template>
 
 <script>
-import TrendsGame from './games/TrendsGame'
+import TrendsGame from './games/TrendsGame.vue'
 const $ = window.jQuery
 
 export default {

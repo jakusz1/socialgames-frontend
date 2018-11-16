@@ -2,7 +2,7 @@
 import Screen from './Screen.vue'
 
 export default {
-  name: 'GameModel',
+  name: 'GameView',
   components: {
     Screen
   },

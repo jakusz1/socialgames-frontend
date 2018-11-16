@@ -10,10 +10,10 @@
 </template>
 
 <script>
-import GameModel from './models/GameModel.vue'
+import GameView from './models/GameView.vue'
 
 export default {
-  mixins: [ GameModel ],
+  mixins: [ GameView ],
   data () {
     return {
       kek: ''
