@@ -23,5 +23,17 @@
     "email":"Email",
     "send":"Send",
     "hello":"Hello",
-    "_code":"code"
+    "_code":"code",
+    "type_dev":"Type the answer on your device!",
+    "hurry":"Hurry up!",
+    "endtime":"End of time!",
+    "tre":{
+        "title":"TrendsGame",
+        "subtitle":"Internet game about the Internet!",
+        "howto":{
+            "title":"Rules",
+            "text":"Sample rules. Sample faggot rules. Just play the fucking game faggot. Easy boi"
+        },
+        "rd4q": "Get ready for the word nr {0}!"
+    }
 }

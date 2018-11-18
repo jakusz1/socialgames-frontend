@@ -1,12 +1,13 @@
 <template>
-  <div class="d-flex flex-grow-1 justify-content-center align-items-center" v-if="active">
+<transition name="fade" mode="out-in">
+  <transition-group name="flip-list" tag="div" class="d-flex flex-grow-1 justify-content-center align-items-center flex-column screen" v-if="active">
     <slot></slot>
-  </div>
+  </transition-group>
+</transition>
 </template>
 
 <script>
 export default {
-  name: 'Screen',
   props: {
     duration: {default: 0},
     onStartFun: {default: () => function () { }},
@@ -44,3 +45,11 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+.screen {
+  position: absolute;
+  width: 100vw;
+  height: 85vh;
+}
+</style>

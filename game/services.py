@@ -1,6 +1,9 @@
+import json
+
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
 from pytrends.request import TrendReq
+import pytrends.exceptions
 from faker import Faker
 
 from game.models import GameSessionTask, deserialize_player, Lang, GameSession, GameType
@@ -26,15 +29,15 @@ def send(uri, command, data, only_screen=False, only_controllers=False):
 
 def start_game(game_session, *args):
     if not args:
-        faker = Faker(game_session.lang.value)
-        args = faker.words(nb=3, ext_word_list=None, unique=False)
+        faker = Faker("en_US")
+        args = faker.words(nb=3, ext_word_list=None)
 
     for arg in args:
         GameSessionTask.objects.create(game_session=game_session, text=arg)
 
     game_session.started = True
     game_session.save()
-    send_question(game_session)
+    # send_question(game_session)
 
 
 def check_if_last_answer(game_task):
@@ -55,24 +58,35 @@ def send_question(game_session):
 
 
 def get_points(game_session):
-    pytrends = TrendReq(hl='PL', tz=0)
+    pytrends = TrendReq(hl='US', tz=0)
     task = game_session.tasks.filter(done=True).first()
     if task:
         answers_checklist = []
         players_list = []
-        for answer in task.answers.all():
+        answers = task.answers.all()
+        for answer in answers:
             answers_checklist.append(answer.text)
             players_list.append(answer.player)
+        try:
+            pytrends.build_payload(answers_checklist, cat=0, timeframe='today 3-m', geo='US', gprop='')
+            scrapped_df = pytrends.interest_over_time()
+        except:
+            return False
 
-        pytrends.build_payload(answers_checklist, cat=0, timeframe='today 3-m', geo='PL', gprop='')
-        scrapped_df = pytrends.interest_over_time().drop(columns='isPartial')
-        scores = scrapped_df.iloc[-1]
-        for i in range(len(scores)):
-            players_list[i].score += scores[i]
-            players_list[i].save()
+        if scrapped_df.size != 0:
+            scrapped_df = scrapped_df.drop(columns='isPartial')
 
-        send(game_session.uri, 'results', {'graph': scrapped_df.to_json(orient='records'),
-                                           'players': [deserialize_player(p) for p in players_list]}, only_screen=True)
-        task.delete()
-        return True
+            scores = scrapped_df.iloc[-1]
+            for i in range(len(scores)):
+                players_list[i].score += scores[i]
+                players_list[i].save()
+            print(json.dumps([answer.to_json() for answer in answers]))
+            send(game_session.uri, "results_graph", '['+scrapped_df.to_json(orient="records")[1:-1]+']',
+                 only_screen=True)
+            send(game_session.uri, "results_answers", json.dumps([answer.to_json() for answer in answers]),
+                 only_screen=True)
+            task.delete()
+            return True
+        else:
+            return False
     return False

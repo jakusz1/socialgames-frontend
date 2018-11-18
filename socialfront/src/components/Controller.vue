@@ -20,10 +20,10 @@
       <div v-else-if="mode == 'textLR'" class="card-body">
         <div class="card-header">{{ title }}</div>
         <div class="card-footer">
-        <form @submit.prevent="postMessage">
+        <form>
               <input :maxlength="20" v-model="message" type="text" :placeholder="$t('type.ans')" class="p-2 w-100" />
-              <button class="btn btn-outline-secondary m-2">{{$t('send')}}: {{message}} {{title}}</button>
-              <button class="btn btn-outline-secondary m-2">{{$t('send')}}: {{title}} {{message}}</button>
+              <button class="btn btn-outline-secondary m-2" v-on:click="postAnsL(true)">{{$t('send')}}: {{message}} {{title}}</button>
+              <button class="btn btn-outline-secondary m-2" v-on:click="postAnsL(false)">{{$t('send')}}: {{title}} {{message}}</button>
         </form>
         </div>
       </div>
@@ -51,6 +51,7 @@ export default {
       messages: [],
       title: '',
       message: '',
+      task_id: null,
       gameType: '',
       game: '',
       choices: [{'id': 'heh', 'text': 'Sample answer number one'},
@@ -88,6 +89,22 @@ export default {
       const data = {message: choice}
 
       $.post(`http://localhost:8000/api/games/${this.$route.params.uri}/messages/`, data, (data) => {
+        this.mode = 'blank'
+      })
+        .fail((response) => {
+          alert(response.responseText)
+        })
+    },
+    postAnsL (left) {
+      var data = ''
+      if (left) {
+        data = {'text': this.message + ' ' + this.title,
+          'type': 'default'}
+      } else {
+        data = {'text': this.title + ' ' + this.message,
+          'type': 'default'}
+      }
+      $.post(`http://localhost:8000/api/tasks/${this.task_id}/answers/`, data, (data) => {
         this.mode = 'blank'
       })
         .fail((response) => {
@@ -162,6 +179,12 @@ export default {
 
     start_game (data) {
       this.mode = data.started ? 'blank' : 'wait_for_start'
+    },
+
+    new_trends_word (data) {
+      this.mode = 'textLR'
+      this.title = data.word
+      this.task_id = data.id
     },
 
     onError (event) {

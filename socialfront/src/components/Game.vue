@@ -1,18 +1,18 @@
 <template>
   <div class="d-flex flex-column flex-grow-1" v-if="sessionStarted">
     <div v-if="mode == 'game'" class="d-flex flex-grow-1">
-      <TrendsGame/>
+      <TrendsGame v-bind:graph="graph" v-bind:answers="answers" />
     </div>
     <div v-else-if="mode == 'wait_for_start'" class="card-body">
       <div class="card-header">{{ $t('waiting.title') }}</div>
     </div>
-    <div class="row">
+    <transition-group name="list-complete" tag="div" class="row">
       <div v-for="player in players" :key="player.id" class="col-sm">
         {{player.username}} {{player.score}}
       </div>
-    </div>
+    </transition-group>
   </div>
-  <div v-else>
+  <div v-else-if="!this.$route.params.uri">
     <button @click="startGameSession" class="btn btn-primary btn-lg btn-block">{{$t('start.game')}}</button>
   </div>
 </template>
@@ -29,9 +29,13 @@ export default {
     return {
       sessionStarted: false,
       mode: 'wait_for_start',
+      gameView: null,
       players: [],
+      answers: [],
+      graph: null,
       game: {},
-      kek: ''
+      kek: '',
+      websocket: null
     }
   },
 
@@ -48,7 +52,6 @@ export default {
       this.joinGameSession()
     }
   },
-
   methods: {
     startGameSession () {
       $.post('http://localhost:8000/api/games/', {game_type: 'tre'}, (data) => {
@@ -106,11 +109,11 @@ export default {
       })
     },
     connectToWebSocket () {
-      const websocket = new WebSocket(`ws://localhost:8000/ws/games/${this.$route.params.uri}`)
-      websocket.onopen = this.onOpen
-      websocket.onclose = this.onClose
-      websocket.onmessage = this.onMessage
-      websocket.onerror = this.onError
+      this.websocket = new WebSocket(`ws://localhost:8000/ws/games/${this.$route.params.uri}`)
+      this.websocket.onopen = this.onOpen
+      this.websocket.onclose = this.onClose
+      this.websocket.onmessage = this.onMessage
+      this.websocket.onerror = this.onError
     },
 
     onOpen (event) {
@@ -134,6 +137,19 @@ export default {
       this.mode = data.started ? 'game' : 'wait_for_start'
     },
 
+    results_graph (data) {
+      debugger
+      this.graph = JSON.parse(data)
+      debugger
+      // this.game = data.game
+    },
+
+    results_answers (data) {
+      debugger
+      this.answers = data
+      debugger
+    },
+
     new_player_joined (data) {
       this.players = data.players
     },
@@ -142,6 +158,16 @@ export default {
       alert('An error occured:', event.data)
     }
   }
+  // watch: {
+  //   mode: function (val) {
+  //     if (val === 'game') {
+  //       this.gameView = this.$children[0]
+  //       debugger
+  //     } else {
+  //       this.gameView = null
+  //     }
+  //   }
+  // }
 }
 </script>
 

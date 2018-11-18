@@ -1,42 +1,61 @@
 <script>
 import Screen from './Screen.vue'
+import Chart from './Chart.vue'
 
 export default {
   name: 'GameView',
   components: {
-    Screen
+    Screen,
+    Chart
   },
   data: function () {
     return {
       currentScreenIndex: 1,
       currentScreen: null,
-      screenTimer: 0,
       screens: [],
+      chart: null,
+      charts: [],
       active: true
     }
   },
   mounted: function () {
-    this.findScreens()
-    this.timerUpdater = setInterval(function () {
-      self.slideTimer++
-    }, 1000)
+    this.findChildren()
   },
   beforeDestroy: function () {
     clearInterval(this.timerUpdater)
   },
   methods: {
-    findScreens: function () {
+    findChildren: function () {
       var self = this
       this.$children.forEach(function (el) {
-        self.screens.push(el)
+        if (el.isScreen) {
+          self.screens.push(el)
+        } else if (el.isChart) {
+          self.charts.push(el)
+        }
       })
       if (self.screens) {
         this.currentScreen = self.screens[0]
       }
     },
+    updateCharts (data) {
+      this.charts.forEach(function (chart) {
+        chart.chartdata = data
+      })
+    },
     nextScreen: function () {
       if (this.currentScreenIndex < this.screens.length + 1) {
         this.currentScreenIndex++
+      }
+    },
+    between: function (from, to) {
+      return this.currentScreen && this.currentScreen.screenTimer >= from && this.currentScreen.screenTimer <= to
+    },
+    timer: function () {
+      if (this.currentScreen) {
+        return this.currentScreen.screenTimer
+      } else {
+        return 0
       }
     }
   },
@@ -51,6 +70,9 @@ export default {
     },
     currentScreenIndex: function (index) {
       this.currentScreen = this.screens[index - 1]
+    },
+    charts: function (val) {
+      this.updateCharts(val)
     }
   }
 }

@@ -5,7 +5,7 @@ from .models import GameSession, GameSessionPlayer, deserialize_player, GameSess
     GameSessionAnswer, GameSessionChoice, GameType
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import permissions
+from rest_framework import permissions, status
 
 import game.services as services
 
@@ -25,8 +25,7 @@ class GameStartView(APIView):
                 'message': 'Game was already started'
             })
         else:
-            game_session.started = True
-            game_session.save()
+            services.start_game(game_session)
         services.send(uri, 'start_game', game_session.to_json())
         return Response({
             'status': 'SUCCESS',
@@ -104,6 +103,27 @@ class GameSessionTaskView(APIView):
         return Response({'status': 'SUCCESS'})
 
 
+class GameSessionFirstTaskView(APIView):
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def get(self, request, *args, **kwargs):
+        game_session = GameSession.objects.get(uri=kwargs['uri'])
+        game_session_task = game_session.tasks.filter(done=False).first()
+        if game_session_task:
+            services.send(kwargs['uri'], 'new_trends_word', {'id': game_session_task.id, 'word': game_session_task.text}, only_controllers=True)
+            game_session_task.done = True
+            game_session_task.save()
+            return Response(game_session_task.to_json())
+
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    def delete(self, request, *args, **kwargs):
+        game_session = GameSession.objects.get(uri=kwargs['uri'])
+        services.get_points(game_session)
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
 class GameSessionAnswerView(APIView):
     permission_classes = (permissions.IsAuthenticated,)
 
@@ -122,8 +142,8 @@ class GameSessionAnswerView(APIView):
         player = GameSessionPlayer.objects.filter(user=user, game_session=game_session_task.game_session).first()
 
         GameSessionAnswer.objects.create(player=player, game_task=game_session_task, text=text, type=answer_type)
-        if services.check_if_last_answer(game_session_task):
-            services.get_points(game_session_task.game_session)
+        # if services.check_if_last_answer(game_session_task):
+        #     services.get_points(game_session_task.game_session)
         return Response({'status': 'SUCCESS'})
 
 
