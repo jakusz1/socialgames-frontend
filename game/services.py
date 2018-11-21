@@ -29,7 +29,7 @@ def send(uri, command, data, only_screen=False, only_controllers=False):
 
 def start_game(game_session, *args):
     if not args:
-        faker = Faker("en_US")
+        faker = Faker("pl_PL" if game_session.lang == "Lang.PL" else "en_US")
         args = faker.words(nb=3, ext_word_list=None)
 
     for arg in args:
@@ -41,7 +41,7 @@ def start_game(game_session, *args):
 
 
 def check_if_last_answer(game_task):
-    if game_task.game_session.game_type == GameType.TRE:
+    if game_task.game_session.game_type == "GameType.TRE":
         return game_task.game_session.players.count() == game_task.answers.count()
     else:  # TODO implement for more advanced games
         return False
@@ -80,11 +80,16 @@ def get_points(game_session):
             for i in range(len(scores)):
                 players_list[i].score += scores[i]
                 players_list[i].save()
+                answer = answers[i]
+                answer.score = int(scores[i])
+                answer.save()
+
             print(json.dumps([answer.to_json() for answer in answers]))
-            send(game_session.uri, "results_graph", '['+scrapped_df.to_json(orient="records")[1:-1]+']',
+            send(game_session.uri, "results_graph", '{'+scrapped_df.to_json(orient="split")[1:-1]+'}',
                  only_screen=True)
             send(game_session.uri, "results_answers", json.dumps([answer.to_json() for answer in answers]),
                  only_screen=True)
+
             task.delete()
             return True
         else:

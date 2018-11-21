@@ -90,9 +90,14 @@ class GameSessionAnswer(models.Model):
     game_task = models.ForeignKey(GameSessionTask, related_name="answers", on_delete=models.CASCADE)
     text = models.TextField(max_length=2000)
     type = models.TextField(max_length=10, default="text")
+    score = models.IntegerField(default=0, null=False)
 
     def to_json(self):
-        return {"username": self.player.user.username, "id": self.id, "type": self.type, "text": self.text}
+        return {"username": self.player.user.username,
+                "id": self.id,
+                "type": self.type,
+                "text": self.text,
+                "score": self.score}
 
 
 class GameSessionChoice(models.Model):

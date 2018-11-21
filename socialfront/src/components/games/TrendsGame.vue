@@ -9,7 +9,7 @@
       <h4 key="1" v-if="between(2,5)">{{$t('tre.howto.text')}}</h4>
     </screen> -->
     <template v-for="(item, index) in 3">
-      <screen :key="index*10+1" :duration="8" :onStartFun="getWord">
+      <screen :key="index*10+1" :duration="8" :onEndFun="getWord">
         <h3 key="0">{{ $t('tre.rd4q', [index+1]) }}</h3>
         <h1 key="1" v-if="between(2,8)">{{ 7-timer() }}</h1>
       </screen>
@@ -20,13 +20,11 @@
         <h4 key="2" v-if="between(51,61)">{{ $t('hurry') }}</h4>
       </screen>
       <screen :key="index*10+3" :duration="5" :onStartFun="endTask">
-        <h2 key="0">{{ $t('endtime') }}</h2>
+        <h2 key="0">{{ $t('endans') }}</h2>
       </screen>
-      <screen :key="index*10+4" :duration="61" v-bind:chartdata="graph">
-        <div key="0a"><chart v-if="graph" v-bind:chartdata="graph"></chart></div>
-        <!-- <div v-bind:v-for="answer in this.$parent.answers" v-bind:key="answer.player.id" class="d-flex">
-          <h4>{{answer.player.username}}</h4><h3>{{answer.text}}</h3>
-        </div> -->
+      <screen :key="index*10+4" :duration="61">
+        <div key="0.1"><answerlist v-if="answers" v-bind:answers="answers"></answerlist></div>
+        <div key="0.0"><chart v-if="graph" v-bind:chartdata="graph"></chart></div>
       </screen>
     </template>
   </div>
@@ -88,7 +86,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style>
 @import url('https://fonts.googleapis.com/css?family=Indie+Flower|KoHo:600');
 h1 {
   font-size: 16vh;

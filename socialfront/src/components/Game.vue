@@ -1,7 +1,7 @@
 <template>
   <div class="d-flex flex-column flex-grow-1" v-if="sessionStarted">
     <div v-if="mode == 'game'" class="d-flex flex-grow-1">
-      <TrendsGame v-bind:graph="graph" v-bind:answers="answers" />
+      <TrendsGame v-bind:graph="graph" v-bind:answers="answers" ref="gameView" />
     </div>
     <div v-else-if="mode == 'wait_for_start'" class="card-body">
       <div class="card-header">{{ $t('waiting.title') }}</div>
@@ -29,7 +29,6 @@ export default {
     return {
       sessionStarted: false,
       mode: 'wait_for_start',
-      gameView: null,
       players: [],
       answers: [],
       graph: null,
@@ -54,7 +53,7 @@ export default {
   },
   methods: {
     startGameSession () {
-      $.post('http://localhost:8000/api/games/', {game_type: 'tre'}, (data) => {
+      window.jQuery.post('http://localhost:8000/api/games/', {game_type: 'tre'}, (data) => {
         alert("A new session has been created you'll be redirected automatically")
         this.sessionStarted = true
         this.$router.push(`/games/${data.uri}/`)
@@ -67,7 +66,7 @@ export default {
     postMessage (event) {
       const data = {message: this.message}
 
-      $.post(`http://localhost:8000/api/games/${this.$route.params.uri}/messages/`, data, (data) => {
+      window.jQuery.post(`http://localhost:8000/api/games/${this.$route.params.uri}/messages/`, data, (data) => {
         this.message = '' // clear the message after sending
       })
         .fail((response) => {
@@ -103,11 +102,6 @@ export default {
       })
     },
 
-    fetchGameSessionHistory () {
-      $.get(`http://127.0.0.1:8000/api/games/${this.$route.params.uri}/messages/`, (data) => {
-        this.messages = data.messages
-      })
-    },
     connectToWebSocket () {
       this.websocket = new WebSocket(`ws://localhost:8000/ws/games/${this.$route.params.uri}`)
       this.websocket.onopen = this.onOpen
@@ -146,7 +140,12 @@ export default {
 
     results_answers (data) {
       debugger
-      this.answers = data
+      this.answers = JSON.parse(data)
+      debugger
+    },
+
+    all_answers (data) {
+      this.$refs.gameView.nextScreen()
       debugger
     },
 

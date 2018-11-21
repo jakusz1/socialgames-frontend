@@ -140,10 +140,10 @@ class GameSessionAnswerView(APIView):
         user = request.user
         game_session_task = GameSessionTask.objects.get(id=kwargs['task_id'])
         player = GameSessionPlayer.objects.filter(user=user, game_session=game_session_task.game_session).first()
-
+        print("post")
         GameSessionAnswer.objects.create(player=player, game_task=game_session_task, text=text, type=answer_type)
-        # if services.check_if_last_answer(game_session_task):
-        #     services.get_points(game_session_task.game_session)
+        if services.check_if_last_answer(game_session_task):
+            services.send(game_session_task.game_session.uri, "all_answers", {}, only_screen=True)
         return Response({'status': 'SUCCESS'})
 
 

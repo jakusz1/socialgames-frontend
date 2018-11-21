@@ -1,12 +1,14 @@
 <script>
 import Screen from './Screen.vue'
 import Chart from './Chart.vue'
+import AnswerList from './AnswerList.vue'
 
 export default {
   name: 'GameView',
   components: {
     Screen,
-    Chart
+    Chart,
+    AnswerList
   },
   data: function () {
     return {
