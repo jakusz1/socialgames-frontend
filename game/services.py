@@ -58,7 +58,8 @@ def send_question(game_session):
 
 
 def get_points(game_session):
-    pytrends = TrendReq(hl='US', tz=0)
+    lang = "PL" if game_session.lang == "Lang.PL" else "US"
+    pytrends = TrendReq(hl=lang, tz=0)
     task = game_session.tasks.filter(done=True).first()
     if task:
         answers_checklist = []
@@ -68,9 +69,14 @@ def get_points(game_session):
             answers_checklist.append(answer.text)
             players_list.append(answer.player)
         try:
-            pytrends.build_payload(answers_checklist, cat=0, timeframe='today 3-m', geo='US', gprop='')
+            pytrends.build_payload(answers_checklist, cat=0, timeframe='today 3-m', geo=lang, gprop='')
             scrapped_df = pytrends.interest_over_time()
         except:
+            send(game_session.uri, "results_graph", "{}",
+                 only_screen=True)
+            send(game_session.uri, "results_answers", json.dumps([answer.to_json() for answer in answers]),
+                 only_screen=True)
+            task.delete()
             return False
 
         if scrapped_df.size != 0:
@@ -92,6 +98,14 @@ def get_points(game_session):
 
             task.delete()
             return True
+
         else:
+            send(game_session.uri, "results_graph", "{}",
+                 only_screen=True)
+            send(game_session.uri, "results_answers", json.dumps([answer.to_json() for answer in answers]),
+                 only_screen=True)
+            task.delete()
             return False
+
+    game_session.delete()
     return False

@@ -81,6 +81,20 @@ class GameSessionView(APIView):
             'game': game_session.to_json()
         })
 
+    def delete(self, request, *args, **kwargs):
+        game_session = GameSession.objects.get(uri=kwargs['uri'])
+        User = get_user_model()
+        username = request.data['username']
+        user = User.objects.get(username=username)
+
+        if game_session.owner == user:
+            winner = game_session.players.order_by("-score").first()
+            game_session.delete()
+            return Response({'status': 'SUCCESS', 'winner': winner.to_json()})
+
+        else:
+            return Response(status=status.HTTP_403_FORBIDDEN)
+
 
 class GameSessionTaskView(APIView):
     permission_classes = (permissions.IsAuthenticated,)

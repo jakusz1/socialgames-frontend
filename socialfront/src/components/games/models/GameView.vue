@@ -8,7 +8,7 @@ export default {
   components: {
     Screen,
     Chart,
-    AnswerList
+    'answerlist': AnswerList
   },
   data: function () {
     return {

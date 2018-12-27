@@ -1,13 +1,13 @@
 <template>
   <div class="d-flex flex-grow-1 gt-hand">
-    <!-- <screen :duration="5">
+    <screen :duration="5">
       <h1 key="0">{{$t('tre.title')}}</h1>
       <h4 key="1" v-if="between(2,5)">{{$t('tre.subtitle')}}</h4>
     </screen>
     <screen :duration="5">
       <h2 key="0">{{$t('tre.howto.title')}}</h2>
       <h4 key="1" v-if="between(2,5)">{{$t('tre.howto.text')}}</h4>
-    </screen> -->
+    </screen>
     <template v-for="(item, index) in 3">
       <screen :key="index*10+1" :duration="8" :onEndFun="getWord">
         <h3 key="0">{{ $t('tre.rd4q', [index+1]) }}</h3>
@@ -17,16 +17,20 @@
         <h2 key="0">{{currentWord}}</h2>
         <h1 key="1" v-if="between(1,61)">{{ 60-timer() }}</h1>
         <h4 key="2" v-if="between(5,26)">{{ $t('type_dev') }}</h4>
-        <h4 key="2" v-if="between(51,61)">{{ $t('hurry') }}</h4>
+        <h4 key="3" v-if="between(51,61)">{{ $t('hurry') }}</h4>
       </screen>
       <screen :key="index*10+3" :duration="5" :onStartFun="endTask">
         <h2 key="0">{{ $t('endans') }}</h2>
       </screen>
-      <screen :key="index*10+4" :duration="61">
+      <screen :key="index*10+4" :duration="5">
         <div key="0.1"><answerlist v-if="answers" v-bind:answers="answers"></answerlist></div>
         <div key="0.0"><chart v-if="graph" v-bind:chartdata="graph"></chart></div>
       </screen>
     </template>
+    <screen :duration="0" :onStartFun="endGame">
+      <h2 key="0" v-if="winner">{{winner.username}} {{$t('winner')}}</h2>
+      <h1 key="1" v-if="winner">{{winner.score}}</h1>
+    </screen>
   </div>
 </template>
 
@@ -38,7 +42,8 @@ export default {
   mixins: [ GameView ],
   props: {
     answers: {default: []},
-    graph: {default: null}
+    graph: {default: null},
+    winner: {default: null}
   },
   data () {
     return {
@@ -73,6 +78,16 @@ export default {
         url: `http://localhost:8000/api/games/${this.$route.params.uri}/task`,
         type: 'DELETE',
         success: () => {}
+      })
+    },
+    endGame () {
+      // this.$parent.username
+      debugger
+      $.ajax({
+        url: `http://localhost:8000/api/games/${this.$route.params.uri}/`,
+        type: 'DELETE',
+        data: {username: this.$parent.username},
+        success: (data) => { this.winner = data.winner }
       })
     }
     // startGame () {

@@ -110,6 +110,7 @@ export default {
         .fail((response) => {
           alert(response.responseText)
         })
+      this.message = ''
     },
     joinGameSession () {
       const uri = this.$route.params.uri

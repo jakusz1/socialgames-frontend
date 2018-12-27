@@ -32,8 +32,9 @@
         "subtitle":"Internet game about the Internet!",
         "howto":{
             "title":"Rules",
-            "text":"Sample rules. Sample faggot rules. Just play the fucking game faggot. Easy boi"
+            "text":"Sample rules. Sample rules. Sample rules."
         },
         "rd4q": "Get ready for the word nr {0}!"
-    }
+    },
+    "winner": " won!"
 }
