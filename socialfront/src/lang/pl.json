@@ -3,38 +3,38 @@
         "name":"SocialGames PL"
     },
     "sign":{
-        "up":"Sign up"
+        "up":"Zarejestruj się"
     },
     "log":{
-        "in":"Log in",
-        "out":"Log out"
+        "in":"Zaloguj się",
+        "out":"Wyloguj się"
     },
     "type":{
-        "ans":"Type your answer"
+        "ans":"Napisz swoją odpowiedź"
     },
     "start":{
-        "game":"Start game"
+        "game":"Wystartuj grę"
     },
     "waiting":{
-        "title":"Waiting for game to start"
+        "title":"Oczekiwanie na rozpoczęcie gry"
     },
-    "username":"Username",
-    "password":"Password",
-    "email":"Email",
-    "send":"Send",
-    "hello":"Hello",
-    "_code":"code",
-    "type_dev":"Type the answer on your device!",
-    "hurry":"Hurry up!",
-    "endans":"End of answering!",
+    "username":"Nazwa użytkownika",
+    "password":"Hasło",
+    "email":"Adres Email",
+    "send":"Wyślij",
+    "hello":"Witaj",
+    "_code":"kod",
+    "type_dev":"Wpisz odpowiedź na swoim kontrolerze!",
+    "hurry":"Pośpiesz się!",
+    "endans":"Koniec odpowiadania!",
     "tre":{
         "title":"TrendsGame",
-        "subtitle":"Internet game about the Internet!",
+        "subtitle":"Internetowa gra o Internecie!",
         "howto":{
-            "title":"Rules",
-            "text":"Sample rules. Sample rules. Sample rules."
+            "title":"Zasady",
+            "text":"Przykładowe zasady. Nie zesraj się. Przykładowe zasady."
         },
-        "rd4q": "Get ready for the word nr {0}!"
+        "rd4q": "Przygotuj się na słowo numer {0}!"
     },
-    "winner": " won!"
+    "winner": " wygrał!"
 }
