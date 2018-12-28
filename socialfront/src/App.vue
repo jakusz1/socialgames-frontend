@@ -3,8 +3,9 @@
     <nav class="navbar navbar-light bg-light">
       <a class="navbar-brand mr-auto" href="#">
         <img src="@/assets/logo.png" width="30" height="30" class="d-inline-block align-top" alt="">
-        SocialGames
+        {{$t('app.name')}}
       </a>
+      <LocaleChanger/>
       <span v-if="getUri()" class="pr-2">{{$t('_code')}}: <b>{{getUri()}}</b></span>
       <a v-if="isLoggedIn()" class="btn btn-outline-success my-2 my-sm-0" href="#/logout">{{$t('log.out')}}</a>
     </nav>
@@ -13,7 +14,12 @@
 </template>
 
 <script>
+import LocaleChanger from './components/LocaleChanger.vue'
+
 export default {
+  components: {
+    LocaleChanger
+  },
   name: 'App',
   methods: {
     isLoggedIn () {

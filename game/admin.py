@@ -1,10 +1,8 @@
 from django.contrib import admin
-from .models import GameSessionPlayer, GameSessionAnswer, GameSessionChoice, \
-    GameSessionTask, GameSession
+from .models import GamePlayer, Answer, Round, Game
 
 # Register your models here.
-admin.site.register(GameSession)
-admin.site.register(GameSessionPlayer)
-admin.site.register(GameSessionAnswer)
-admin.site.register(GameSessionChoice)
-admin.site.register(GameSessionTask)
+admin.site.register(Game)
+admin.site.register(GamePlayer)
+admin.site.register(Answer)
+admin.site.register(Round)

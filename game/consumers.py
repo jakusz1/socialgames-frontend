@@ -1,12 +1,12 @@
 from channels.generic.websocket import JsonWebsocketConsumer
 from asgiref.sync import async_to_sync
 
-from game.models import GameSession
+from game.models import Game
 import game.services as services
 from socialgames.settings import GAME_SETTINGS
 
 
-class GameSessionConsumer(JsonWebsocketConsumer):
+class GameConsumer(JsonWebsocketConsumer):
 
     def connect(self):
         # if self.scope["user"].is_anonymous:
@@ -26,7 +26,7 @@ class GameSessionConsumer(JsonWebsocketConsumer):
 
         command = content.get("command", None)
         content['user'] = self.scope['user']
-        content['game'] = GameSession.objects.get(uri=uri)
+        content['game'] = Game.objects.get(uri=uri)
         method = getattr(self, command, self.wrong_command)
         method(content)
 
@@ -77,7 +77,7 @@ class GameSessionConsumer(JsonWebsocketConsumer):
         self.send_json(content["response"])
 
     def __auth_game(self):
-        return GameSession.objects.filter(uri=self.scope["url_route"]["kwargs"]["uri"]).exists()
+        return Game.objects.filter(uri=self.scope["url_route"]["kwargs"]["uri"]).exists()
 
     def __get_uri(self):
         if self.scope["url_route"]["kwargs"]["device_type"] == "games":

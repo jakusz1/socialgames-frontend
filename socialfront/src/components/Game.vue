@@ -53,8 +53,7 @@ export default {
   },
   methods: {
     startGameSession () {
-      window.jQuery.post('http://localhost:8000/api/games/', {game_type: 'tre'}, (data) => {
-        alert("A new session has been created you'll be redirected automatically")
+      window.jQuery.post('http://localhost:8000/api/games/', {}, (data) => {
         this.sessionStarted = true
         this.$router.push(`/games/${data.uri}/`)
         this.joinGameSession()
@@ -88,10 +87,10 @@ export default {
           this.game = data.game
           debugger
           this.players = data.game.players
-          if (this.game.started) {
-            this.mode = 'game'
-          } else {
+          if (this.game.step === 'PRE') {
             this.mode = 'wait_for_start'
+          } else {
+            this.mode = 'game'
           }
           if (user) {
             // The user belongs/has joined the session
@@ -128,7 +127,11 @@ export default {
     },
 
     start_game (data) {
-      this.mode = data.started ? 'game' : 'wait_for_start'
+      if (data.step === 'PRE') {
+        this.mode = 'wait_for_start'
+      } else {
+        this.mode = 'game'
+      }
     },
 
     results_graph (data) {
@@ -149,7 +152,7 @@ export default {
       debugger
     },
 
-    new_player_joined (data) {
+    update_players_list (data) {
       this.players = data.players
     },
 

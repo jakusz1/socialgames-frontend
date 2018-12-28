@@ -19,7 +19,7 @@
         <h4 key="2" v-if="between(5,26)">{{ $t('type_dev') }}</h4>
         <h4 key="3" v-if="between(51,61)">{{ $t('hurry') }}</h4>
       </screen>
-      <screen :key="index*10+3" :duration="5" :onStartFun="endTask">
+      <screen :key="index*10+3" :duration="5" :onStartFun="endRound">
         <h2 key="0">{{ $t('endans') }}</h2>
       </screen>
       <screen :key="index*10+4" :duration="5">
@@ -54,28 +54,17 @@ export default {
     }
   },
   methods: {
-    testMethod () {
-      debugger
-      console.log('CHUUUUUUUUUUUUUUUUJ')
-      this.kek = 'CHUJ PIZDA DZIALA'
-      this.$parent.kek = 'CHUJ PIZDA DZIALA'
-      this.$parent.$parent.kek = 'CHUJ PIZDA DZIALA'
-    },
     getWord () {
-      $.get(`http://localhost:8000/api/games/${this.$route.params.uri}/task`, (data) => {
+      $.get(`http://localhost:8000/api/games/${this.$route.params.uri}/round`, (data) => {
         this.currentWord = data.text
       })
         .fail((response) => {
           alert(response.responseText)
         })
     },
-    endTask () {
-      // $.delete(`http://localhost:8000/api/games/${this.$route.params.uri}/task`)
-      //   .fail((response) => {
-      //     alert(response.responseText)
-      //   })
+    endRound () {
       $.ajax({
-        url: `http://localhost:8000/api/games/${this.$route.params.uri}/task`,
+        url: `http://localhost:8000/api/games/${this.$route.params.uri}/round`,
         type: 'DELETE',
         success: () => {}
       })

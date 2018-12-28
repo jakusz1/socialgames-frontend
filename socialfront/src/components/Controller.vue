@@ -20,7 +20,7 @@
       <div v-else-if="mode == 'textLR'" class="card-body">
         <div class="card-header">{{ title }}</div>
         <div class="card-footer">
-        <form>
+        <form v-on:submit.prevent>
               <input :maxlength="20" v-model="message" type="text" :placeholder="$t('type.ans')" class="p-2 w-100" />
               <button class="btn btn-outline-secondary m-2" v-on:click="postAnsL(true)">{{$t('send')}}: {{message}} {{title}}</button>
               <button class="btn btn-outline-secondary m-2" v-on:click="postAnsL(false)">{{$t('send')}}: {{title}} {{message}}</button>
@@ -51,7 +51,7 @@ export default {
       messages: [],
       title: '',
       message: '',
-      task_id: null,
+      round_id: null,
       gameType: '',
       game: '',
       choices: [{'id': 'heh', 'text': 'Sample answer number one'},
@@ -104,7 +104,7 @@ export default {
         data = {'text': this.title + ' ' + this.message,
           'type': 'default'}
       }
-      $.post(`http://localhost:8000/api/tasks/${this.task_id}/answers/`, data, (data) => {
+      $.post(`http://localhost:8000/api/rounds/${this.round_id}/answers/`, data, (data) => {
         this.mode = 'blank'
       })
         .fail((response) => {
@@ -122,10 +122,12 @@ export default {
         success: (data) => {
           const user = data.game.players.find((player) => player.username === this.username)
           this.game = data.game
-          if (this.game.started) {
-            this.mode = 'blank'
-          } else {
+          if (this.game.step === 'PRE') {
             this.mode = 'wait_for_start'
+          } else if (this.game.step === 'ANS') {
+            this.mode = 'textLR'
+          } else {
+            this.mode = 'blank'
           }
           if (user) {
             // The user belongs/has joined the session
@@ -144,10 +146,12 @@ export default {
         type: 'PATCH',
         success: (data) => {
           this.game = data.game
-          if (this.game.started) {
-            this.mode = 'blank'
-          } else {
+          if (this.game.step === 'PRE') {
             this.mode = 'wait_for_start'
+          } else if (this.game.step === 'ANS') {
+            this.mode = 'textLR'
+          } else {
+            this.mode = 'blank'
           }
         }
       })
@@ -179,13 +183,19 @@ export default {
     },
 
     start_game (data) {
-      this.mode = data.started ? 'blank' : 'wait_for_start'
+      if (data.step === 'PRE') {
+        this.mode = 'wait_for_start'
+      } else if (data.step === 'ANS') {
+        this.mode = 'textLR'
+      } else {
+        this.mode = 'blank'
+      }
     },
 
-    new_trends_word (data) {
+    new_round (data) {
       this.mode = 'textLR'
       this.title = data.word
-      this.task_id = data.id
+      this.round_id = data.id
     },
 
     onError (event) {
