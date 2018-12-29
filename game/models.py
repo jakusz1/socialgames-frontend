@@ -79,6 +79,7 @@ class GamePlayer(models.Model):
     def to_json(self):
         return {"id": self.id,
                 "username": self.user.username,
+                "email": self.user.email,
                 "score": self.score,
                 "total_score": self.user.userstats.total_score,
                 "total_won": self.user.userstats.total_won}

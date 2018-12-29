@@ -29,8 +29,7 @@ def send(uri, command, data, only_screen=False, only_controllers=False):
 
 def start_game(game, *args):
     if not args:
-        print(Lang[game.lang].value)
-        faker = Faker('en_US')
+        faker = Faker(Lang[game.lang].value)
         args = faker.words(nb=3, ext_word_list=None)
 
     for arg in args:
@@ -107,5 +106,6 @@ def get_points(game):
             game_round.delete()
             return False
 
+    send(game.uri, 'go_back', {})
     game.delete()
     return False

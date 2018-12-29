@@ -9,11 +9,6 @@ from socialgames.settings import GAME_SETTINGS
 class GameConsumer(JsonWebsocketConsumer):
 
     def connect(self):
-        # if self.scope["user"].is_anonymous:
-        #     self.close()
-
-        # if not self.__auth_game():
-        #     self.close()
 
         async_to_sync(self.channel_layer.group_add)(
             self.__get_uri(),
@@ -29,12 +24,6 @@ class GameConsumer(JsonWebsocketConsumer):
         content['game'] = Game.objects.get(uri=uri)
         method = getattr(self, command, self.wrong_command)
         method(content)
-
-    def message(self, content):
-        self.send_response({
-            "user": self.scope["user"].username,
-            "message": content['message']
-        })
 
     def wrong_command(self, content):
         self.send_response({
@@ -75,9 +64,6 @@ class GameConsumer(JsonWebsocketConsumer):
 
     def broadcast(self, content):
         self.send_json(content["response"])
-
-    def __auth_game(self):
-        return Game.objects.filter(uri=self.scope["url_route"]["kwargs"]["uri"]).exists()
 
     def __get_uri(self):
         if self.scope["url_route"]["kwargs"]["device_type"] == "games":

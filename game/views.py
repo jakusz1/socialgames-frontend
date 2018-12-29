@@ -48,7 +48,12 @@ class GameView(APIView):
     def patch(self, request, *args, **kwargs):
         uri = kwargs['uri']
         user = request.user
-        game = Game.objects.get(uri=uri)
+        game = Game.objects.filter(uri=uri)
+
+        if not game.exists():
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        game = game.first()
         player = game.players.filter(user=user, game=game)
 
         if game.step != "PRE" and not player.exists():
@@ -67,10 +72,10 @@ class GameView(APIView):
         user = request.user
 
         if game.owner == user:
-            winner = game.players.order_by("-score").first().to_json()
-            final_players_list = game.players.order_by("-score").all().to_json()
+            final_players_list = [player.to_json() for player in game.players.order_by("-score").all()]
             game.delete()
-            return Response({'status': 'SUCCESS', 'winner': winner, 'players': final_players_list})
+            services.send(kwargs['uri'], 'go_back', {}, only_controllers=True)
+            return Response({'status': 'SUCCESS', 'winners': final_players_list})
 
         else:
             return Response(status=status.HTTP_403_FORBIDDEN)

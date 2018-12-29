@@ -8,12 +8,35 @@
     </div>
     <transition-group name="list-complete" tag="div" class="row">
       <div v-for="player in players" :key="player.id" class="col-sm">
-        {{player.username}} {{player.score}}
+        {{player.username}}
       </div>
     </transition-group>
   </div>
-  <div v-else-if="!this.$route.params.uri">
-    <button @click="startGameSession" class="btn btn-primary btn-lg btn-block">{{$t('start.game')}}</button>
+  <div v-else-if="!this.$route.params.uri" class="container">
+    <div class="card-body">
+      <div class="card-header">
+        <h2>{{$t('start.new_game_title')}}</h2>
+      </div>
+      <div class="card-footer">
+        <form @submit.prevent="startGameSession" class="form-inline">
+          <select v-model="game_lang" class="form-control form-control-lg">
+            <option v-for="(lang, i) in langs" :key="`Lang${i}`" :value="lang">{{ lang }}</option>
+          </select>
+          <button class="btn btn-success btn-lg">{{$t('start.btn')}}</button>
+        </form>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="card-header">
+        <h2>{{$t('controller.connect_title')}}</h2>
+      </div>
+      <div class="card-footer">
+        <form @submit.prevent="startController" class="form-inline">
+          <input pattern=".{4}" required :title="$t('code.length')" v-model="code" class="form-control form-control-lg" type="text" :placeholder="$t('controller.code')" />
+          <button class="btn btn-success btn-lg">{{$t('controller.join')}}</button>
+        </form>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -34,7 +57,10 @@ export default {
       graph: null,
       game: {},
       kek: '',
-      websocket: null
+      websocket: null,
+      code: '',
+      langs: ['pl_PL', 'en_US'],
+      game_lang: 'pl_PL'
     }
   },
 
@@ -53,7 +79,7 @@ export default {
   },
   methods: {
     startGameSession () {
-      window.jQuery.post('http://localhost:8000/api/games/', {}, (data) => {
+      window.jQuery.post('http://localhost:8000/api/games/', {lang: this.game_lang}, (data) => {
         this.sessionStarted = true
         this.$router.push(`/games/${data.uri}/`)
         this.joinGameSession()
@@ -61,19 +87,6 @@ export default {
         .fail((response) => {
           alert(response.responseText)
         })
-    },
-    postMessage (event) {
-      const data = {message: this.message}
-
-      window.jQuery.post(`http://localhost:8000/api/games/${this.$route.params.uri}/messages/`, data, (data) => {
-        this.message = '' // clear the message after sending
-      })
-        .fail((response) => {
-          alert(response.responseText)
-        })
-    },
-    testM () {
-      debugger
     },
     joinGameSession () {
       const uri = this.$route.params.uri
@@ -85,20 +98,18 @@ export default {
         success: (data) => {
           const user = data.game.players.find((player) => player.username === this.username)
           this.game = data.game
-          debugger
           this.players = data.game.players
-          if (this.game.step === 'PRE') {
-            this.mode = 'wait_for_start'
-          } else {
-            this.mode = 'game'
-          }
+          this.start_game(this.game)
           if (user) {
-            // The user belongs/has joined the session
             this.sessionStarted = true
             this.connectToWebSocket()
           }
         }
       })
+    },
+
+    startController () {
+      this.$router.push(`/controllers/${this.code.toLowerCase()}/`)
     },
 
     connectToWebSocket () {
@@ -115,8 +126,6 @@ export default {
 
     onClose (event) {
       console.log('Connection closed.', event.data)
-
-      // Try and Reconnect after five seconds
       setTimeout(this.connectToWebSocket, 5000)
     },
 
@@ -156,6 +165,12 @@ export default {
       this.players = data.players
     },
 
+    go_back (data) {
+      this.websocket.close()
+      this.sessionStarted = false
+      this.$router.push(`/games/`)
+    },
+
     onError (event) {
       alert('An error occured:', event.data)
     }
@@ -175,4 +190,7 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+form input[type="text"] {
+    text-transform: lowercase;
+}
 </style>

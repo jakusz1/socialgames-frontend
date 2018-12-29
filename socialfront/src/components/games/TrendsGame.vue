@@ -27,9 +27,11 @@
         <div key="0.0"><chart v-if="graph" v-bind:chartdata="graph"></chart></div>
       </screen>
     </template>
-    <screen :duration="0" :onStartFun="endGame">
-      <h2 key="0" v-if="winner">{{winner.username}} {{$t('winner')}}</h2>
-      <h1 key="1" v-if="winner">{{winner.score}}</h1>
+    <screen :duration="20" :onStartFun="endGame" :onEndFun="go_back">
+      <h2 key="0" v-if="winners">{{winners[0].username}} {{$t('winner')}}</h2>
+      <h1 key="1" v-if="winners">{{winners[0].score}}</h1>
+      <h5 key="2" v-if="winners[1]">2. {{winners[1].username}} {{winners[1].username}}</h5>
+      <h5 key="3" v-if="winners[2]">3. {{winners[2].username}} {{winners[2].username}}</h5>
     </screen>
   </div>
 </template>
@@ -43,7 +45,7 @@ export default {
   props: {
     answers: {default: []},
     graph: {default: null},
-    winner: {default: null}
+    winners: {default: []}
   },
   data () {
     return {
@@ -76,8 +78,12 @@ export default {
         url: `http://localhost:8000/api/games/${this.$route.params.uri}/`,
         type: 'DELETE',
         data: {username: this.$parent.username},
-        success: (data) => { this.winner = data.winner }
+        success: (data) => { this.winners = data.winners }
       })
+    },
+    go_back () {
+      debugger
+      this.$parent.go_back()
     }
     // startGame () {
     //   debugger

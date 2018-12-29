@@ -4,19 +4,14 @@
       <div v-if="mode == 'blank'" class="card-body">
       </div>
       <div v-else-if="mode == 'wait_for_start'" class="card-body">
-        <button @click="startGame" class="btn btn-primary">{{$t('start.game')}}</button>
-      </div>
-
-      <div v-else-if="mode == 'text'" class="card-body">
-        <div class="card-header">{{ title }}</div>
+        <button @click="startGame" class="btn btn-primary btn-block">{{$t('start.game')}}</button>
         <div class="card-footer">
-        <form @submit.prevent="postMessage">
-              <input :maxlength="20" v-model="message" type="text" :placeholder="$t('type.ans')" class="p-2 w-100" />
-              <button class="btn btn-outline-secondary w-100 m-2">{{$t('send')}}: {{message}}</button>
-        </form>
+        <h2>{{$t('waiting.players')}}</h2>
+        <div v-for="player in players" :key="player.id" class="col-sm">
+          <a data-toggle="tooltip" data-html="true" :title="'<p><b>'+player.email+'</b></p><p>'+$t('total.score')+': '+player.total_score+'</p><p>'+$t('total.won')+': '+player.total_won+'</p>'" data-placement="bottom">{{player.username}}</a>
+        </div>
         </div>
       </div>
-
       <div v-else-if="mode == 'textLR'" class="card-body">
         <div class="card-header">{{ title }}</div>
         <div class="card-footer">
@@ -27,21 +22,16 @@
         </form>
         </div>
       </div>
-
-      <div v-else-if="mode == 'choiceText'" class="card-body">
-        <div class="card-header">{{ title }}</div>
-        <div class="card-footer">
-          <div v-for="choice in choices" :key="choice.id">
-            <button class="btn btn-outline-secondary w-100 m-2 p-2" v-on:click="postChoice(choice.id)">{{choice.text}}</button>
-          </div>
-        </div>
-      </div>
     </div>
   </div>
 </template>
 
 <script>
 const $ = window.jQuery
+
+$('body').tooltip({
+  selector: '[data-toggle="tooltip"]'
+})
 
 export default {
   data () {
@@ -54,8 +44,7 @@ export default {
       round_id: null,
       gameType: '',
       game: '',
-      choices: [{'id': 'heh', 'text': 'Sample answer number one'},
-        {'id': 'heh2', 'text': 'Sample answer number two'}]
+      players: []
     }
   },
 
@@ -75,26 +64,6 @@ export default {
   },
 
   methods: {
-    postMessage (event) {
-      const data = {message: this.message}
-
-      $.post(`http://localhost:8000/api/games/${this.$route.params.uri}/messages/`, data, (data) => {
-        this.message = '' // clear the message after sending
-      })
-        .fail((response) => {
-          alert(response.responseText)
-        })
-    },
-    postChoice (choice) {
-      const data = {message: choice}
-
-      $.post(`http://localhost:8000/api/games/${this.$route.params.uri}/messages/`, data, (data) => {
-        this.mode = 'blank'
-      })
-        .fail((response) => {
-          alert(response.responseText)
-        })
-    },
     postAnsL (left) {
       var data = ''
       if (left) {
@@ -196,6 +165,16 @@ export default {
       this.mode = 'textLR'
       this.title = data.word
       this.round_id = data.id
+    },
+
+    update_players_list (data) {
+      this.players = data.players
+      $('[data-toggle="tooltip"]').tooltip()
+    },
+
+    go_back (data) {
+      this.websocket.close()
+      this.$router.push(`/games/`)
     },
 
     onError (event) {

@@ -47,7 +47,7 @@
 </template>
 
 <script>
-const $ = window.jQuery // JQuery
+const $ = window.jQuery
 
 export default {
 

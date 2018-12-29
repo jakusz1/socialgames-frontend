@@ -12,11 +12,20 @@
     "type":{
         "ans":"Type your answer"
     },
+
     "start":{
-        "game":"Start game"
+        "game":"Start game",
+        "new_game_title":"Start a new game",
+        "btn":"Start"
+    },
+    "controller":{
+        "connect_title":"Join existing game",
+        "join":"Join",
+        "code":"Type your game code"
     },
     "waiting":{
-        "title":"Waiting for game to start"
+        "title":"Waiting for game to start",
+        "players":"Connected players"
     },
     "username":"Username",
     "password":"Password",
@@ -36,5 +45,12 @@
         },
         "rd4q": "Get ready for the word nr {0}!"
     },
-    "winner": " won!"
+    "winner": " won!",
+    "code":{
+        "length":"Code has 4 letters"
+    },
+    "total":{
+        "score":"Total score",
+        "won":"Total won"
+    }
 }
