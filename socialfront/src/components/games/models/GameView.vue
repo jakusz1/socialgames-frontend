@@ -63,7 +63,7 @@ export default {
   },
   watch: {
     currentScreen: function (newScreen, oldScreen) {
-      debugger
+      
       if (oldScreen) {
         oldScreen.active = false
       }
