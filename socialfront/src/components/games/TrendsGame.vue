@@ -71,7 +71,7 @@ export default {
     },
     endGame () {
       // this.$parent.username
-      debugger
+      
       $.ajax({
         url: `http://localhost:8000/api/games/${this.$route.params.uri}/`,
         type: 'DELETE',
@@ -80,11 +80,11 @@ export default {
       })
     }
     // startGame () {
-    //   debugger
+    //   
     //   this.$parent.websocket.send(JSON.stringify({
     //     'command': 'start_game'
     //   }))
-    //   debugger
+    //   
     // }
   }
 }
