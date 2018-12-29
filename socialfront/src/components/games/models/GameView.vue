@@ -43,6 +43,9 @@ export default {
     updateCharts (data) {
       this.charts.forEach(function (chart) {
         chart.chartdata = data
+        chart.options = {
+          responsive: true,
+          maintainAspectRatio: false }
       })
     },
     nextScreen: function () {
@@ -63,7 +66,6 @@ export default {
   },
   watch: {
     currentScreen: function (newScreen, oldScreen) {
-      
       if (oldScreen) {
         oldScreen.active = false
       }

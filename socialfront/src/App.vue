@@ -1,11 +1,11 @@
 <template>
   <div id="app" class="d-flex flex-column flex-grow-1">
     <nav class="navbar navbar-light bg-light">
-      <a class="navbar-brand mr-auto" href="#">
+      <a class="navbar-brand mr-auto" href="#/">
         <img src="@/assets/logo.png" width="30" height="30" class="d-inline-block align-top" alt="">
         {{$t('app.name')}}
       </a>
-      <a v-if="getUsername()" class="btn btn-link my-2 my-sm-0" href="#/profile">{{getUsername()}}</a>
+      <a v-if="getToken()" class="btn btn-link my-2 my-sm-0" href="#/profile">{{getUsername()}}</a>
       <LocaleChanger/>
       <a v-if="getToken()" class="btn btn-outline-success my-2 my-sm-0" href="#/logout">{{$t('log.out')}}</a>
     </nav>

@@ -62,7 +62,7 @@ export default {
         this.signIn()
       })
         .fail((response) => {
-          alert(response.responseText)
+          alert(this.$t('sign.error'))
         })
     },
 
@@ -72,14 +72,10 @@ export default {
       $.post('http://localhost:8000/auth/token/create/', credentials, (data) => {
         sessionStorage.setItem('authToken', data.auth_token)
         sessionStorage.setItem('username', this.username)
-        if (this.$route.query.from) {
-          this.$router.push(this.$route.query.from)
-        } else {
-          this.$router.push('/games')
-        }
+        this.$router.push('/')
       })
         .fail((response) => {
-          alert(response.responseText)
+          alert(this.$t('log.error'))
         })
     }
   }

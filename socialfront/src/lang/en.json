@@ -3,11 +3,13 @@
         "name":"SocialGames EN"
     },
     "sign":{
-        "up":"Sign up"
+        "up":"Sign up",
+        "error":"Entered data is not valid or there is already an account with that data"
     },
     "log":{
         "in":"Log in",
-        "out":"Log out"
+        "out":"Log out",
+        "error":"Entered data is not valid"
     },
     "type":{
         "ans":"Type your answer"
@@ -52,5 +54,8 @@
     "total":{
         "score":"Total score",
         "won":"Total won"
-    }
+    },
+    "edit_profile":"Edit profile",
+    "save":"Save",
+    "discard":"Discard"
 }

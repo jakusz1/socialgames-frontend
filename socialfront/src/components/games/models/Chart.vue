@@ -1,4 +1,5 @@
 <script>
+/* eslint-disable */
 import { Line } from 'vue-chartjs'
 import moment from 'moment'
 
@@ -28,7 +29,7 @@ export default {
     this.renderChart(x, this.options)
   }
 }
-const colors = ['#FC2525', '#25FC25', '#2525FC'];
+const colors = ['#007bff', '#6f42c1', '#fd7e14', '#28a745', '#17a2b8'];
 
 function prepareDatasets(djangoDataset, playersCount, gradient) {
   const datasets = [];
@@ -37,10 +38,8 @@ function prepareDatasets(djangoDataset, playersCount, gradient) {
     let dataset = {
       label: djangoDataset.columns[i],
       borderColor: colors[i],
-      pointBackgroundColor: 'white',
-      borderWidth: 1,
-      pointBorderColor: 'white',
-      backgroundColor: gradient,
+      borderWidth: 3,
+      pointRadius: 0,
       data: values
     };
     datasets.push(dataset);

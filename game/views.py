@@ -36,8 +36,7 @@ class GameView(APIView):
 
     def post(self, request, *args, **kwargs):
         user = request.user
-
-        game = Game.objects.create(owner=user)
+        game = Game.objects.create(owner=user, lang=request.data['lang'][-2:])
         GamePlayer.objects.create(user=user, game=game)
 
         return Response({
@@ -137,3 +136,28 @@ class AnswerView(APIView):
             services.send(game_round.game.uri, 'all_answers', {}, only_screen=True)
 
         return Response({'status': 'SUCCESS'})
+
+
+class UserView(APIView):
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def get(self, request, *args, **kwargs):
+        user = request.user
+
+        return Response({'username': user.username,
+                         'email': user.email,
+                         'total_won': user.userstats.total_won,
+                         'total_score': user.userstats.total_score})
+
+    def post(self, request, *args, **kwargs):
+        user = request.user
+        user.username = request.data['username']
+        user.email = request.data['email']
+        try:
+            user.save()
+        except:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+        return Response({'status': 'SUCCESS',
+                         'username': user.username,
+                         'email': user.email})

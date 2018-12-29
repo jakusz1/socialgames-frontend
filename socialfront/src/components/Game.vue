@@ -1,42 +1,21 @@
 <template>
-  <div class="d-flex flex-column flex-grow-1" v-if="sessionStarted">
+  <div class="d-flex flex-column flex-grow-1">
     <div v-if="mode == 'game'" class="d-flex flex-grow-1">
       <TrendsGame v-bind:graph="graph" v-bind:answers="answers" ref="gameView" />
     </div>
     <div v-else-if="mode == 'wait_for_start'" class="card-body">
-      <div class="card-header">{{ $t('waiting.title') }}</div>
+      <div class="card-header">
+        <h1>{{ $t('waiting.title') }}</h1>
+      </div>
+      <div class="card-footer">
+        <h1>{{ $t('_code') }} <b> {{ this.$route.params.uri }} </b></h1>
+      </div>
     </div>
     <transition-group name="list-complete" tag="div" class="row">
       <div v-for="player in players" :key="player.id" class="col-sm">
         {{player.username}}
       </div>
     </transition-group>
-  </div>
-  <div v-else-if="!this.$route.params.uri" class="container">
-    <div class="card-body">
-      <div class="card-header">
-        <h2>{{$t('start.new_game_title')}}</h2>
-      </div>
-      <div class="card-footer">
-        <form @submit.prevent="startGameSession" class="form-inline">
-          <select v-model="game_lang" class="form-control form-control-lg">
-            <option v-for="(lang, i) in langs" :key="`Lang${i}`" :value="lang">{{ lang }}</option>
-          </select>
-          <button class="btn btn-success btn-lg">{{$t('start.btn')}}</button>
-        </form>
-      </div>
-    </div>
-    <div class="card-body">
-      <div class="card-header">
-        <h2>{{$t('controller.connect_title')}}</h2>
-      </div>
-      <div class="card-footer">
-        <form @submit.prevent="startController" class="form-inline">
-          <input pattern=".{4}" required :title="$t('code.length')" v-model="code" class="form-control form-control-lg" type="text" :placeholder="$t('controller.code')" />
-          <button class="btn btn-success btn-lg">{{$t('controller.join')}}</button>
-        </form>
-      </div>
-    </div>
   </div>
 </template>
 
@@ -50,7 +29,7 @@ export default {
   },
   data () {
     return {
-      sessionStarted: false,
+      sessionStarted: true,
       mode: 'wait_for_start',
       players: [],
       answers: [],
@@ -73,21 +52,9 @@ export default {
         'Authorization': `Token ${sessionStorage.getItem('authToken')}`
       }
     })
-    if (this.$route.params.uri) {
-      this.joinGameSession()
-    }
+    this.joinGameSession()
   },
   methods: {
-    startGameSession () {
-      window.jQuery.post('http://localhost:8000/api/games/', {lang: this.game_lang}, (data) => {
-        this.sessionStarted = true
-        this.$router.push(`/games/${data.uri}/`)
-        this.joinGameSession()
-      })
-        .fail((response) => {
-          alert(response.responseText)
-        })
-    },
     joinGameSession () {
       const uri = this.$route.params.uri
 
@@ -101,15 +68,10 @@ export default {
           this.players = data.game.players
           this.start_game(this.game)
           if (user) {
-            this.sessionStarted = true
             this.connectToWebSocket()
           }
         }
       })
-    },
-
-    startController () {
-      this.$router.push(`/controllers/${this.code.toLowerCase()}/`)
     },
 
     connectToWebSocket () {
@@ -166,25 +128,13 @@ export default {
     },
 
     go_back (data) {
-      this.websocket.close()
-      this.sessionStarted = false
-      this.$router.push(`/games/`)
+      this.$router.push(`/`)
     },
 
     onError (event) {
       alert('An error occured:', event.data)
     }
   }
-  // watch: {
-  //   mode: function (val) {
-  //     if (val === 'game') {
-  //       this.gameView = this.$children[0]
-  //       debugger
-  //     } else {
-  //       this.gameView = null
-  //     }
-  //   }
-  // }
 }
 </script>
 

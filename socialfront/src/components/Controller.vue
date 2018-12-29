@@ -146,7 +146,6 @@ export default {
     },
 
     onMessage (event) {
-      
       const data = JSON.parse(event.data)
       this[data.command](data.data)
     },
@@ -173,8 +172,7 @@ export default {
     },
 
     go_back (data) {
-      this.websocket.close()
-      this.$router.push(`/games/`)
+      this.$router.push(`/`)
     },
 
     onError (event) {

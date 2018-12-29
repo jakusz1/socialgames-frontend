@@ -5,6 +5,7 @@ from channels.layers import get_channel_layer
 from pytrends.request import TrendReq
 import pytrends.exceptions
 from faker import Faker
+import datetime
 
 from game.models import Round, Lang, Game, Step
 from socialgames.settings import GAME_SETTINGS
@@ -64,11 +65,19 @@ def get_points(game):
         answers_checklist = []
         players_list = []
         answers = game_round.answers.all()
+
         for answer in answers:
             answers_checklist.append(answer.text)
             players_list.append(answer.player)
+
+        now = datetime.datetime.now()
+        date = now - datetime.timedelta(days=365)
+
         try:
-            pytrends.build_payload(answers_checklist, cat=0, timeframe='today 3-m', geo=game.lang, gprop='')
+            pytrends.build_payload(answers_checklist, cat=0,
+                                   timeframe=date.strftime("%Y-%m-%d") + ' ' + now.strftime("%Y-%m-%d"),
+                                   geo=game.lang,
+                                   gprop='')
             scrapped_df = pytrends.interest_over_time()
         except:
             send(game.uri, "results_graph", "{}",

@@ -10,4 +10,5 @@ urlpatterns = [
     path('games/<uri>/rounds/', views.AllRoundsView.as_view()),
     path('games/<uri>/round', views.FirstRoundView.as_view()),
     path('rounds/<round_id>/answers/', views.AnswerView.as_view()),
+    path('user/', views.UserView.as_view()),
 ]

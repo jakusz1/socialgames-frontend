@@ -22,16 +22,14 @@
       <screen :key="index*10+3" :duration="5" :onStartFun="endRound">
         <h2 key="0">{{ $t('endans') }}</h2>
       </screen>
-      <screen :key="index*10+4" :duration="5">
+      <screen :key="index*10+4" :duration="8000">
         <div key="0.1"><answerlist v-if="answers" v-bind:answers="answers"></answerlist></div>
-        <div key="0.0"><chart v-if="graph" v-bind:chartdata="graph"></chart></div>
+        <div key="0.0" class="chart-container"><chart v-if="graph" v-bind:chartdata="graph" v-bind:options="options"></chart></div>
       </screen>
     </template>
     <screen :duration="20" :onStartFun="endGame" :onEndFun="go_back">
       <h2 key="0" v-if="winners">{{winners[0].username}} {{$t('winner')}}</h2>
       <h1 key="1" v-if="winners">{{winners[0].score}}</h1>
-      <h5 key="2" v-if="winners[1]">2. {{winners[1].username}} {{winners[1].username}}</h5>
-      <h5 key="3" v-if="winners[2]">3. {{winners[2].username}} {{winners[2].username}}</h5>
     </screen>
   </div>
 </template>
@@ -45,11 +43,15 @@ export default {
   props: {
     answers: {default: []},
     graph: {default: null},
-    winners: {default: []}
+    winners: {default: null}
   },
   data () {
     return {
-      currentWord: 'no-data'
+      currentWord: 'no-data',
+      options: {responsive: true, maintainAspectRatio: false},
+      styles: {
+
+      }
       // answers: [{'id': 1,
       //   'player': {'username': 'rikitiki'},
       //   'text': 'HASDJHASKJDH'}]
@@ -72,8 +74,6 @@ export default {
       })
     },
     endGame () {
-      // this.$parent.username
-      
       $.ajax({
         url: `http://localhost:8000/api/games/${this.$route.params.uri}/`,
         type: 'DELETE',
@@ -85,18 +85,11 @@ export default {
       debugger
       this.$parent.go_back()
     }
-    // startGame () {
-    //   
-    //   this.$parent.websocket.send(JSON.stringify({
-    //     'command': 'start_game'
-    //   }))
-    //   
-    // }
   }
 }
 </script>
 
-<style>
+<style scoped>
 @import url('https://fonts.googleapis.com/css?family=Indie+Flower|KoHo:600');
 h1 {
   font-size: 16vh;
@@ -115,5 +108,9 @@ h5 {
 }
 .gt-hand {
   font-family: 'KoHo', sans-serif;
+}
+.chart-container {
+  max-width: 800px;
+  margin:  0 auto;
 }
 </style>
