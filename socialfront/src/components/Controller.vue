@@ -177,7 +177,7 @@ export default {
     },
 
     onMessage (event) {
-      debugger
+      
       const data = JSON.parse(event.data)
       this[data.command](data.data)
     },
