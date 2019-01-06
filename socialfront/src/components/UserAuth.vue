@@ -58,7 +58,7 @@ export default {
   },
   methods: {
     signUp () {
-      $.post('http://localhost:8000/auth/users/create/', this.$data, (data) => {
+      $.post('http://192.168.1.111:8000/auth/users/create/', this.$data, (data) => {
         this.signIn()
       })
         .fail((response) => {
@@ -69,7 +69,7 @@ export default {
     signIn () {
       const credentials = {username: this.username, password: this.password}
 
-      $.post('http://localhost:8000/auth/token/create/', credentials, (data) => {
+      $.post('http://192.168.1.111:8000/auth/token/create/', credentials, (data) => {
         sessionStorage.setItem('authToken', data.auth_token)
         sessionStorage.setItem('username', this.username)
         this.$router.push('/')

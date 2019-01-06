@@ -12,7 +12,7 @@
       </div>
     </div>
     <transition-group name="list-complete" tag="div" class="row">
-      <div v-for="player in players" :key="player.id" class="col-sm">
+      <div v-for="player in players" :key="player.id" class="col-sm text-5">
         {{player.username}}
       </div>
     </transition-group>
@@ -59,7 +59,7 @@ export default {
       const uri = this.$route.params.uri
 
       $.ajax({
-        url: `http://localhost:8000/api/games/${uri}/`,
+        url: `http://192.168.1.111:8000/api/games/${uri}/`,
         data: {username: this.username},
         type: 'PATCH',
         success: (data) => {
@@ -98,7 +98,7 @@ export default {
     },
 
     start_game (data) {
-      if (data.step === 'PRE') {
+      if (data.status === 'PRE') {
         this.mode = 'wait_for_start'
       } else {
         this.mode = 'game'
@@ -142,5 +142,8 @@ export default {
 <style scoped>
 form input[type="text"] {
     text-transform: lowercase;
+}
+.text-5{
+  font-size: 5vh;
 }
 </style>

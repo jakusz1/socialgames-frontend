@@ -1,7 +1,7 @@
 from django.contrib.auth import get_user_model
 
 from socialgames.settings import GAME_SETTINGS
-from .models import Game, GamePlayer, Round, Answer, Step
+from .models import Game, GamePlayer, Round, Answer, Status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import permissions, status
@@ -18,7 +18,7 @@ class GameStartView(APIView):
         game = Game.objects.get(uri=uri)
         player = game.players.filter(user=user, game=game)
 
-        if game.step != "PRE" or not player.exists():
+        if game.status != "PRE" or not player.exists():
             return Response(status=status.HTTP_403_FORBIDDEN)
         else:
             services.start_game(game)
@@ -27,7 +27,8 @@ class GameStartView(APIView):
 
         return Response({
             'status': 'SUCCESS',
-            'message': '%s started game' % user.username
+            'message': '%s started game' % user.username,
+            'game': game.to_json()
         })
 
 
@@ -55,7 +56,7 @@ class GameView(APIView):
         game = game.first()
         player = game.players.filter(user=user, game=game)
 
-        if game.step != "PRE" and not player.exists():
+        if game.status != "PRE" and not player.exists():
             return Response(status=status.HTTP_403_FORBIDDEN)
 
         game.players.get_or_create(user=user, game=game)
@@ -98,7 +99,7 @@ class FirstRoundView(APIView):
         game = Game.objects.get(uri=kwargs['uri'])
         first_round = game.rounds.filter(done=False).first()
         if first_round:
-            game.step = Step.ANS.name
+            game.status = Status.ANS.name
             game.save()
             services.send(kwargs['uri'], 'new_round',
                           {'id': first_round.id, 'word': first_round.text}, only_controllers=True)

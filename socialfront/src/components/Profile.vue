@@ -72,7 +72,7 @@ export default {
         'Authorization': `Token ${sessionStorage.getItem('authToken')}`
       }
     })
-    $.get(`http://localhost:8000/api/user/`, (data) => {
+    $.get(`http://192.168.1.111:8000/api/user/`, (data) => {
       this.username = data.username
       this.email = data.email
       this.total_won = data.total_won
@@ -89,7 +89,7 @@ export default {
       this.edit_mode = true
     },
     save () {
-      $.post(`http://localhost:8000/api/user/`, {username: this.new_username, email: this.new_email}, (data) => {
+      $.post(`http://192.168.1.111:8000/api/user/`, {username: this.new_username, email: this.new_email}, (data) => {
         this.username = data.username
         this.email = data.email
         sessionStorage.setItem('username', this.username)

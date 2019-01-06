@@ -7,37 +7,39 @@ import pytrends.exceptions
 from faker import Faker
 import datetime
 
-from game.models import Round, Lang, Game, Step
+from game.models import Round, Lang, Game, Status
 from socialgames.settings import GAME_SETTINGS
 
 
 def send(uri, command, data, only_screen=False, only_controllers=False):
     channel_layer = get_channel_layer()
     if not only_controllers:
-        async_to_sync(channel_layer.group_send)(uri, {"type": "broadcast",
-                                                      "response": {
-                                                          "command": command,
-                                                          "data": data
-                                                      }})
+        async_to_sync(channel_layer.group_send) \
+            (uri, {"type": "broadcast",
+                   "response": {
+                       "command": command,
+                       "data": data
+                   }})
     if not only_screen:
-        async_to_sync(channel_layer.group_send)(uri + GAME_SETTINGS['controller_postfix'],
-                                                {"type": "broadcast",
-                                                 "response": {
-                                                     "command": command,
-                                                     "data": data
-                                                 }})
+        async_to_sync(channel_layer.group_send) \
+            (uri + GAME_SETTINGS['controller_postfix'],
+             {"type": "broadcast",
+              "response": {
+                  "command": command,
+                  "data": data
+              }})
 
 
 def start_game(game, *args):
     if not args:
         faker = Faker(Lang[game.lang].value)
-        args = faker.words(nb=3, ext_word_list=None)
+        args = faker.words(nb=10, ext_word_list=None)
 
     for arg in args:
         print(arg)
         Round.objects.create(game=game, text=arg)
 
-    game.step = Step.IDL.name
+    game.status = Status.IDL.name
     game.save()
 
 
@@ -50,7 +52,7 @@ def send_question(game):
     if game_round:
         send(game.uri, 'new_round', game_round.to_json())
         game_round.done = True
-        game_round.game.step = Step.ANS.name
+        game_round.game.status = Status.ANS.name
         game_round.save()
         return True
     return False
@@ -59,7 +61,7 @@ def send_question(game):
 def get_points(game):
     game_round = game.rounds.filter(done=True).first()
     if game_round:
-        game.step = Step.IDL.name
+        game.status = Status.IDL.name
         game.save()
         pytrends = TrendReq(hl=game.lang, tz=0)
         answers_checklist = []

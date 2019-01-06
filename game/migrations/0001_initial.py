@@ -29,7 +29,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('uri', models.CharField(default=game.models._generate_unique_uri, max_length=4)),
                 ('lang', models.CharField(choices=[('EN', 'en_US'), ('PL', 'pl_PL')], default=game.models.Lang('pl_PL'), max_length=2)),
-                ('step', models.CharField(choices=[('PRE', 'not_started'), ('IDL', 'started_not_answering'), ('ANS', 'started_answering')], default=game.models.Step('not_started'), max_length=3)),
+                ('step', models.CharField(choices=[('PRE', 'not_started'), ('IDL', 'started_not_answering'), ('ANS', 'started_answering')], default=game.models.Status('not_started'), max_length=3)),
                 ('owner', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
             ],
         ),

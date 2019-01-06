@@ -3,10 +3,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from django.conf import settings
-from channels.layers import get_channel_layer
-from asgiref.sync import async_to_sync
-from pytrends.request import TrendReq
+from django import forms
 
 from socialgames.settings import GAME_SETTINGS
 
@@ -27,7 +24,7 @@ class Lang(ChoiceEnum):
     PL = "pl_PL"
 
 
-class Step(ChoiceEnum):
+class Status(ChoiceEnum):
     PRE = "not_started"
     IDL = "started_not_answering"
     ANS = "started_answering"
@@ -56,14 +53,14 @@ class Game(models.Model):
     lang = models.CharField(max_length=2,
                             choices=Lang.choices(),
                             default=Lang.PL.name)
-    step = models.CharField(max_length=3,
-                            choices=Step.choices(),
-                            default=Step.PRE.name)
+    status = models.CharField(max_length=3,
+                            choices=Status.choices(),
+                            default=Status.PRE.name)
 
     def to_json(self):
         return {"id": self.id,
                 "lang": self.lang,
-                "step": self.step,
+                "status": self.status,
                 "players": [player.to_json()
                             for player in self.players.all()],
                 "rounds": self.rounds.count()}

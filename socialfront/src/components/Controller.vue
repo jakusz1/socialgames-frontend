@@ -73,7 +73,7 @@ export default {
         data = {'text': this.title + ' ' + this.message,
           'type': 'default'}
       }
-      $.post(`http://localhost:8000/api/rounds/${this.round_id}/answers/`, data, (data) => {
+      $.post(`http://192.168.1.111:8000/api/rounds/${this.round_id}/answers/`, data, (data) => {
         this.mode = 'blank'
       })
         .fail((response) => {
@@ -85,15 +85,15 @@ export default {
       const uri = this.$route.params.uri
 
       $.ajax({
-        url: `http://localhost:8000/api/games/${uri}/`,
+        url: `http://192.168.1.111:8000/api/games/${uri}/`,
         data: {username: this.username},
         type: 'PATCH',
         success: (data) => {
           const user = data.game.players.find((player) => player.username === this.username)
           this.game = data.game
-          if (this.game.step === 'PRE') {
+          if (this.game.status === 'PRE') {
             this.mode = 'wait_for_start'
-          } else if (this.game.step === 'ANS') {
+          } else if (this.game.status === 'ANS') {
             this.mode = 'textLR'
           } else {
             this.mode = 'blank'
@@ -110,14 +110,14 @@ export default {
     startGame () {
       const uri = this.$route.params.uri
       $.ajax({
-        url: `http://localhost:8000/api/games/${uri}/start`,
+        url: `http://192.168.1.111:8000/api/games/${uri}/start`,
         data: {username: this.username},
         type: 'PATCH',
         success: (data) => {
           this.game = data.game
-          if (this.game.step === 'PRE') {
+          if (this.game.status === 'PRE') {
             this.mode = 'wait_for_start'
-          } else if (this.game.step === 'ANS') {
+          } else if (this.game.status === 'ANS') {
             this.mode = 'textLR'
           } else {
             this.mode = 'blank'
@@ -151,9 +151,9 @@ export default {
     },
 
     start_game (data) {
-      if (data.step === 'PRE') {
+      if (data.status === 'PRE') {
         this.mode = 'wait_for_start'
-      } else if (data.step === 'ANS') {
+      } else if (data.status === 'ANS') {
         this.mode = 'textLR'
       } else {
         this.mode = 'blank'

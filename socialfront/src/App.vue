@@ -2,7 +2,7 @@
   <div id="app" class="d-flex flex-column flex-grow-1">
     <nav class="navbar navbar-light bg-light">
       <a class="navbar-brand mr-auto" href="#/">
-        <img src="@/assets/logo.png" width="30" height="30" class="d-inline-block align-top" alt="">
+        <img src="@/assets/logo.png" width="45" height="30" class="d-inline-block align-top" alt="">
         {{$t('app.name')}}
       </a>
       <a v-if="getToken()" class="btn btn-link my-2 my-sm-0" href="#/profile">{{getUsername()}}</a>
