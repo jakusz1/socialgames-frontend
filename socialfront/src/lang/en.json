@@ -57,5 +57,8 @@
     },
     "edit_profile":"Edit profile",
     "save":"Save",
-    "discard":"Discard"
+    "discard":"Discard",
+    "pts":"pts",
+    "no_data":"Not enough searches for this phrases!",
+    "inprog":"Wait for the next round!"
 }

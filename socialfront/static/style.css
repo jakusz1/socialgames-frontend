@@ -17,14 +17,3 @@
 .flip-list-item {
   transition: all 1s;
 }
-
-.list-complete-move {
-  transition: transform 1s;
-}
-.list-complete-enter-active, .list-complete-leave-active {
-  transition: opacity .5s;
-}
-.list-complete-enter, .list-complete-leave-to {
-  opacity: 0;
-  transform: translateY(-100px); /* TODO fix, not working */
-}

@@ -1,12 +1,9 @@
-from django.contrib.auth import get_user_model
-
-from socialgames.settings import GAME_SETTINGS
-from .models import Game, GamePlayer, Round, Answer, Status
-from rest_framework.views import APIView
-from rest_framework.response import Response
 from rest_framework import permissions, status
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
 import game.services as services
+from .models import Game, GamePlayer, Round, Answer, Status
 
 
 class GameStartView(APIView):
@@ -18,11 +15,10 @@ class GameStartView(APIView):
         game = Game.objects.get(uri=uri)
         player = game.players.filter(user=user, game=game)
 
-        if game.status != "PRE" or not player.exists():
+        if game.status != "PRE" or not player.exists() or game.players.count() < 2:
             return Response(status=status.HTTP_403_FORBIDDEN)
-        else:
-            services.start_game(game)
 
+        services.start_game(game)
         services.send(uri, 'start_game', game.to_json())
 
         return Response({
@@ -56,7 +52,7 @@ class GameView(APIView):
         game = game.first()
         player = game.players.filter(user=user, game=game)
 
-        if game.status != "PRE" and not player.exists():
+        if game.status != "PRE" and not player.exists() or game.players.count() == 5:
             return Response(status=status.HTTP_403_FORBIDDEN)
 
         game.players.get_or_create(user=user, game=game)
@@ -72,10 +68,7 @@ class GameView(APIView):
         user = request.user
 
         if game.owner == user:
-            final_players_list = [player.to_json() for player in game.players.order_by("-score").all()]
-            game.delete()
-            services.send(kwargs['uri'], 'go_back', {}, only_controllers=True)
-            return Response({'status': 'SUCCESS', 'winners': final_players_list})
+            return Response({'status': 'SUCCESS', 'winners': services.end_game(game)})
 
         else:
             return Response(status=status.HTTP_403_FORBIDDEN)

@@ -11,9 +11,9 @@
         <h1>{{ $t('_code') }} <b> {{ this.$route.params.uri }} </b></h1>
       </div>
     </div>
-    <transition-group name="list-complete" tag="div" class="row">
+    <transition-group name="flip-list" tag="div" class="row">
       <div v-for="player in players" :key="player.id" class="col-sm text-5">
-        {{player.username}}
+        {{player.username}} {{player.score}}
       </div>
     </transition-group>
   </div>
@@ -32,6 +32,7 @@ export default {
       sessionStarted: true,
       mode: 'wait_for_start',
       players: [],
+      new_players: [],
       answers: [],
       graph: null,
       game: {},
@@ -45,8 +46,6 @@ export default {
 
   created () {
     this.username = sessionStorage.getItem('username')
-
-    // Setup headers for all requests
     $.ajaxSetup({
       headers: {
         'Authorization': `Token ${sessionStorage.getItem('authToken')}`
@@ -59,7 +58,7 @@ export default {
       const uri = this.$route.params.uri
 
       $.ajax({
-        url: `http://192.168.1.111:8000/api/games/${uri}/`,
+        url: `http://${this.$backend}/api/games/${uri}/`,
         data: {username: this.username},
         type: 'PATCH',
         success: (data) => {
@@ -75,7 +74,7 @@ export default {
     },
 
     connectToWebSocket () {
-      this.websocket = new WebSocket(`ws://localhost:8000/ws/games/${this.$route.params.uri}`)
+      this.websocket = new WebSocket(`ws://${this.$backend}/ws/games/${this.$route.params.uri}`)
       this.websocket.onopen = this.onOpen
       this.websocket.onclose = this.onClose
       this.websocket.onmessage = this.onMessage
@@ -92,7 +91,6 @@ export default {
     },
 
     onMessage (event) {
-      debugger
       const data = JSON.parse(event.data)
       this[data.command](data.data)
     },
@@ -106,25 +104,27 @@ export default {
     },
 
     results_graph (data) {
-      debugger
       this.graph = JSON.parse(data)
-      debugger
-      // this.game = data.game
     },
 
     results_answers (data) {
-      debugger
       this.answers = JSON.parse(data)
-      debugger
     },
 
     all_answers (data) {
       this.$refs.gameView.nextScreen()
-      debugger
     },
 
     update_players_list (data) {
       this.players = data.players
+    },
+
+    send_players_silent (data) {
+      this.new_players = data.players
+    },
+
+    update_new_players (data) {
+      this.players = this.new_players
     },
 
     go_back (data) {
@@ -138,7 +138,6 @@ export default {
 }
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 form input[type="text"] {
     text-transform: lowercase;

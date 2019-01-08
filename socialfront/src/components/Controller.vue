@@ -4,7 +4,7 @@
       <div v-if="mode == 'blank'" class="card-body">
       </div>
       <div v-else-if="mode == 'wait_for_start'" class="card-body">
-        <button @click="startGame" class="btn btn-primary btn-block">{{$t('start.game')}}</button>
+        <button @click="startGame" :disabled="players.length < 2" class="btn btn-primary btn-block">{{$t('start.game')}}</button>
         <div class="card-footer">
         <h2>{{$t('waiting.players')}}</h2>
         <div v-for="player in players" :key="player.id" class="col-sm">
@@ -12,15 +12,18 @@
         </div>
         </div>
       </div>
-      <div v-else-if="mode == 'textLR'" class="card-body">
+      <div v-else-if="mode == 'textLR' && title" class="card-body">
         <div class="card-header">{{ title }}</div>
         <div class="card-footer">
         <form v-on:submit.prevent>
               <input :maxlength="20" v-model="message" type="text" :placeholder="$t('type.ans')" class="p-2 w-100" />
-              <button class="btn btn-outline-secondary m-2" v-on:click="postAnsL(true)">{{$t('send')}}: {{message}} {{title}}</button>
-              <button class="btn btn-outline-secondary m-2" v-on:click="postAnsL(false)">{{$t('send')}}: {{title}} {{message}}</button>
+              <button class="btn btn-outline-secondary m-2" v-on:click="postAnsL(true)" :disabled="this.message.length==0">{{$t('send')}}: {{message}} {{title}}</button>
+              <button class="btn btn-outline-secondary m-2" v-on:click="postAnsL(false)" :disabled="this.message.length==0">{{$t('send')}}: {{title}} {{message}}</button>
         </form>
         </div>
+      </div>
+      <div v-else-if="mode == 'textLR'" class="card-body">
+        <div class="card-header">{{ $t('inprog') }}</div>
       </div>
     </div>
   </div>
@@ -50,8 +53,6 @@ export default {
 
   created () {
     this.username = sessionStorage.getItem('username')
-
-    // Setup headers for all requests
     $.ajaxSetup({
       headers: {
         'Authorization': `Token ${sessionStorage.getItem('authToken')}`
@@ -73,7 +74,7 @@ export default {
         data = {'text': this.title + ' ' + this.message,
           'type': 'default'}
       }
-      $.post(`http://192.168.1.111:8000/api/rounds/${this.round_id}/answers/`, data, (data) => {
+      $.post(`http://${this.$backend}/api/rounds/${this.round_id}/answers/`, data, (data) => {
         this.mode = 'blank'
       })
         .fail((response) => {
@@ -85,7 +86,7 @@ export default {
       const uri = this.$route.params.uri
 
       $.ajax({
-        url: `http://192.168.1.111:8000/api/games/${uri}/`,
+        url: `http://${this.$backend}/api/games/${uri}/`,
         data: {username: this.username},
         type: 'PATCH',
         success: (data) => {
@@ -99,9 +100,7 @@ export default {
             this.mode = 'blank'
           }
           if (user) {
-            // The user belongs/has joined the session
             this.sessionStarted = true
-            // this.fetchGameSessionHistory()
           }
         }
       })
@@ -110,7 +109,7 @@ export default {
     startGame () {
       const uri = this.$route.params.uri
       $.ajax({
-        url: `http://192.168.1.111:8000/api/games/${uri}/start`,
+        url: `http://${this.$backend}/api/games/${uri}/start`,
         data: {username: this.username},
         type: 'PATCH',
         success: (data) => {
@@ -127,7 +126,7 @@ export default {
     },
 
     connectToWebSocket () {
-      const websocket = new WebSocket(`ws://localhost:8000/ws/controllers/${this.$route.params.uri}`)
+      const websocket = new WebSocket(`ws://${this.$backend}/ws/controllers/${this.$route.params.uri}`)
       websocket.onopen = this.onOpen
       websocket.onclose = this.onClose
       websocket.onmessage = this.onMessage
@@ -140,8 +139,6 @@ export default {
 
     onClose (event) {
       console.log('Connection closed.', event.data)
-
-      // Try and Reconnect after five seconds
       setTimeout(this.connectToWebSocket, 5000)
     },
 

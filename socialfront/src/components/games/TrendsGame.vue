@@ -19,16 +19,23 @@
         <h4 key="2" v-if="between(5,26)">{{ $t('type_dev') }}</h4>
         <h4 key="3" v-if="between(51,61)">{{ $t('hurry') }}</h4>
       </screen>
-      <screen :key="index*10+3" :duration="30" :onStartFun="endRound">
+      <screen :key="index*10+3" :duration="10" :onStartFun="endRound">
         <h2 key="0">{{ $t('endans') }}</h2>
       </screen>
-      <screen :key="index*10+4" :duration="20">
+      <screen :key="index*10+4" :duration="20" :onStartFun="update_new_players">
         <div key="0.1" class="chart-container"><chart v-if="graph" v-bind:chartdata="graph" v-bind:options="options"></chart></div>
-        <div key="0.0"><answerlist v-if="answers" v-bind:answers="answers"></answerlist></div>
+        <div key="0.0">
+          <answerlist v-if="answers" v-bind:answers="answers"></answerlist>
+        </div>
       </screen>
     </template>
     <screen :duration="20" :onStartFun="endGame" :onEndFun="go_back">
-      <h2 key="0" v-if="winners">1. {{winners[0].username}} {{winners[0].score}}pts</h2>
+      <div key="0" v-if="winners">
+        <h1>1. {{winners[0].username}} {{winners[0].score}} {{$t('pts')}}</h1>
+        <template v-for="(winner, pos) in winners.slice(1, 4)">
+          <h2 :key="pos">{{pos+2}}. {{winner.username}} {{winner.score}}{{$t('pts')}}</h2>
+        </template>
+      </div>
     </screen>
   </div>
 </template>
@@ -47,18 +54,12 @@ export default {
   data () {
     return {
       currentWord: 'no-data',
-      options: {responsive: true, maintainAspectRatio: false},
-      styles: {
-
-      }
-      // answers: [{'id': 1,
-      //   'player': {'username': 'rikitiki'},
-      //   'text': 'HASDJHASKJDH'}]
+      options: {responsive: true, maintainAspectRatio: false}
     }
   },
   methods: {
     getWord () {
-      $.get(`http://192.168.1.111:8000/api/games/${this.$route.params.uri}/round`, (data) => {
+      $.get(`http://${this.$backend}/api/games/${this.$route.params.uri}/round`, (data) => {
         this.currentWord = data.text
       })
         .fail((response) => {
@@ -67,22 +68,24 @@ export default {
     },
     endRound () {
       $.ajax({
-        url: `http://192.168.1.111:8000/api/games/${this.$route.params.uri}/round`,
+        url: `http://${this.$backend}/api/games/${this.$route.params.uri}/round`,
         type: 'DELETE',
         success: () => {}
       })
     },
     endGame () {
       $.ajax({
-        url: `http://192.168.1.111:8000/api/games/${this.$route.params.uri}/`,
+        url: `http://${this.$backend}/api/games/${this.$route.params.uri}/`,
         type: 'DELETE',
         data: {username: this.$parent.username},
         success: (data) => { this.winners = data.winners }
       })
     },
     go_back () {
-      debugger
       this.$parent.go_back()
+    },
+    update_new_players () {
+      this.$parent.update_new_players()
     }
   }
 }
@@ -97,10 +100,10 @@ h2 {
   font-size: 12vh;
 }
 h3 {
-  font-size: 8vh;
+  font-size: 7vh;
 }
 h4 {
-  font-size: 4vh;
+  font-size: 5vh;
 }
 h5 {
   font-size: 3vh;

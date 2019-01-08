@@ -39,7 +39,6 @@ export default {
       answers: [],
       graph: null,
       game: {},
-      kek: '',
       websocket: null,
       code: '',
       langs: ['pl_PL', 'en_US'],
@@ -59,7 +58,7 @@ export default {
   },
   methods: {
     startGame () {
-      window.jQuery.post('http://192.168.1.111:8000/api/games/', {lang: this.game_lang}, (data) => {
+      window.jQuery.post(`http://${this.$backend}/api/games/`, {lang: this.game_lang}, (data) => {
         this.$router.push(`/games/${data.uri}/`)
       })
         .fail((response) => {

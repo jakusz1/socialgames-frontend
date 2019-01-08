@@ -1,16 +1,13 @@
-from django.db import models
-from django.contrib.auth import get_user_model
+import random
+import string
+from enum import Enum
+
 from django.contrib.auth.models import User
+from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from django import forms
 
 from socialgames.settings import GAME_SETTINGS
-
-import string
-import random
-
-from enum import Enum
 
 
 class ChoiceEnum(Enum):
@@ -30,18 +27,7 @@ class Status(ChoiceEnum):
     ANS = "started_answering"
 
 
-# User = get_user_model()
-
-
-# def deserialize_player(player):
-#     """Deserialize user instance to JSON"""
-#     if player:
-#         return {"id": player.user.id, "username": player.user.username, "score": player.score}
-#     return {}
-
-
 def _generate_unique_uri():
-    """Generates a unique uri for the game session"""
     all_chars = string.ascii_lowercase
     return "".join(random.choice(all_chars) for _ in range(GAME_SETTINGS["code_length"]))
 
@@ -54,8 +40,8 @@ class Game(models.Model):
                             choices=Lang.choices(),
                             default=Lang.PL.name)
     status = models.CharField(max_length=3,
-                            choices=Status.choices(),
-                            default=Status.PRE.name)
+                              choices=Status.choices(),
+                              default=Status.PRE.name)
 
     def to_json(self):
         return {"id": self.id,
@@ -99,6 +85,7 @@ class Answer(models.Model):
 
     def to_json(self):
         return {"username": self.player.user.username,
+                "player_id": self.player.id,
                 "id": self.id,
                 "text": self.text,
                 "score": self.score}

@@ -1,9 +1,6 @@
-from django import forms
 from django.contrib import admin
-from django.contrib.auth.forms import ReadOnlyPasswordHashField
 from django.contrib.auth.admin import UserAdmin
-from django.contrib.auth.models import Group, User, AbstractUser
-from django.urls import reverse_lazy
+from django.contrib.auth.models import Group, User
 from rest_framework.authtoken.models import Token
 
 from .models import Game

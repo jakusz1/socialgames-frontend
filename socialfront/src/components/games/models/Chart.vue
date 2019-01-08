@@ -16,17 +16,20 @@ export default {
     }
   },
   mounted () {
-    const data = this.chartdata;
-    const playersCount = data.columns.length;
-    const datasets = prepareDatasets(data, playersCount, this.gradient);
-    const labels = data.index.map(function(e) {
-      return moment(new Date(e).toString()).format("MM/DD/YYYY")
-    });
-    const x = {
-      labels: labels,
-      datasets: datasets
+    if (this.chartdata && typeof this.chartdata.columns !== 'undefined') {
+      this.noData = false;
+      const data = this.chartdata;
+      const playersCount = data.columns.length;
+      const datasets = prepareDatasets(data, playersCount, this.gradient);
+      const labels = data.index.map(function(e) {
+        return moment(new Date(e).toString()).format("MM/DD/YYYY")
+      });
+      const x = {
+        labels: labels,
+        datasets: datasets
+      }
+      this.renderChart(x, this.options)
     }
-    this.renderChart(x, this.options)
   }
 }
 const colors = ['#007bff', '#6f42c1', '#fd7e14', '#28a745', '#17a2b8'];

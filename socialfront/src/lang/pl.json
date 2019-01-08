@@ -3,20 +3,31 @@
         "name":"SocialGames PL"
     },
     "sign":{
-        "up":"Zarejestruj się"
+        "up":"Zarejestruj się",
+        "error":"Dane nie są poprawne bądź istnieje już użytkownik z podanymi danymi"
     },
     "log":{
         "in":"Zaloguj się",
-        "out":"Wyloguj się"
+        "out":"Wyloguj się",
+        "error":"Dane nie są poprawne"
     },
     "type":{
         "ans":"Napisz swoją odpowiedź"
     },
+
     "start":{
-        "game":"Wystartuj grę"
+        "game":"Wystartuj grę",
+        "new_game_title":"Rozpocznij nową grę",
+        "btn":"Start"
+    },
+    "controller":{
+        "connect_title":"Dołącz do istniejącej gry",
+        "join":"Dołącz",
+        "code":"Wpisz kod gry"
     },
     "waiting":{
-        "title":"Oczekiwanie na rozpoczęcie gry"
+        "title":"Oczekiwanie na rozpoczęcie gry",
+        "players":"Połączeni gracze"
     },
     "username":"Nazwa użytkownika",
     "password":"Hasło",
@@ -32,9 +43,22 @@
         "subtitle":"Internetowa gra o Internecie!",
         "howto":{
             "title":"Zasady",
-            "text":"Przykładowe zasady. Nie zesraj się. Przykładowe zasady."
+            "text":"Stwórz najczęściej wyszukiwaną frazę z podanym słowem!"
         },
         "rd4q": "Przygotuj się na słowo numer {0}!"
     },
-    "winner": " wygrał!"
+    "winner": " wygrał!",
+    "code":{
+        "length":"Kod ma 4 litery"
+    },
+    "total":{
+        "score":"Całkowity wynik",
+        "won":"Wygranych"
+    },
+    "edit_profile":"Edytuj profil",
+    "save":"Zapisz",
+    "discard":"Anuluj",
+    "pts":"pkt",
+    "no_data":"Zbyt mało wyszukiwań podanych fraz!",
+    "inprog":"Poczekaj na nową rundę!"
 }
