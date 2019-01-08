@@ -5,7 +5,7 @@
   "author": "jakusz1 <13085272+jakusz1@users.noreply.github.com>",
   "private": true,
   "scripts": {
-    "dev": "webpack-dev-server --watch --inline --progress --config build/webpack.dev.conf.js",
+    "dev": "webpack-dev-server --watch --inline --progress --config build/webpack.dev.conf.js --host 0.0.0.0",
     "start": "npm run dev",
     "unit": "jest --config test/unit/jest.conf.js --coverage",
     "e2e": "node test/e2e/runner.js",
@@ -17,6 +17,7 @@
   "dependencies": {
     "animate.css": "^3.7.0",
     "chart.js": "2.7.3",
+    "moment": "^2.23.0",
     "vue": "^2.5.2",
     "vue-chartjs": "3.4.0",
     "vue-i18n": "^8.3.1",

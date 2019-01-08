@@ -1,169 +1,157 @@
-from django.contrib.auth import get_user_model
-
-from socialgames.settings import GAME_SETTINGS
-from .models import GameSession, GameSessionPlayer, deserialize_player, GameSessionTask, \
-    GameSessionAnswer, GameSessionChoice, GameType
-from rest_framework.views import APIView
-from rest_framework.response import Response
 from rest_framework import permissions, status
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
 import game.services as services
+from .models import Game, GamePlayer, Round, Answer, Status
 
 
 class GameStartView(APIView):
-    def patch(self, request, *args, **kwargs):
-        User = get_user_model()
+    permission_classes = (permissions.IsAuthenticated,)
 
+    def patch(self, request, *args, **kwargs):
         uri = kwargs['uri']
-        username = request.data['username']
-        user = User.objects.get(username=username)
-        game_session = GameSession.objects.get(uri=uri)
-        player = game_session.players.filter(user=user, game_session=game_session)
-        if game_session.started or not player.exists():
-            return Response({
-                'status': 'ERROR',
-                'message': 'Game was already started'
-            })
-        else:
-            services.start_game(game_session)
-        services.send(uri, 'start_game', game_session.to_json())
+        user = request.user
+        game = Game.objects.get(uri=uri)
+        player = game.players.filter(user=user, game=game)
+
+        if game.status != "PRE" or not player.exists() or game.players.count() < 2:
+            return Response(status=status.HTTP_403_FORBIDDEN)
+
+        services.start_game(game)
+        services.send(uri, 'start_game', game.to_json())
+
         return Response({
             'status': 'SUCCESS',
             'message': '%s started game' % user.username,
-            'game': game_session.to_json()
+            'game': game.to_json()
         })
 
 
-class GameSessionView(APIView):
-    """Manage Game sessions."""
-
+class GameView(APIView):
     permission_classes = (permissions.IsAuthenticated,)
 
     def post(self, request, *args, **kwargs):
-        """create a new Game session."""
         user = request.user
-        game_type = request.data['game_type']
-
-        if game_type == 'tre':
-            game_session = GameSession.objects.create(owner=user, game_type=GameType.TRE)
-            GameSessionPlayer.objects.create(user=user, game_session=game_session)
-
-            return Response({
-                'status': 'SUCCESS', 'uri': game_session.uri,
-                'message': 'New game session created'
-            })
+        game = Game.objects.create(owner=user, lang=request.data['lang'][-2:])
+        GamePlayer.objects.create(user=user, game=game)
 
         return Response({
-            'status': 'ERROR',
-            'message': 'Game_type is not recognized'
+            'status': 'SUCCESS', 'uri': game.uri,
+            'message': 'New game created'
         })
 
     def patch(self, request, *args, **kwargs):
-        """Add a player to a game session."""
-        User = get_user_model()
-
         uri = kwargs['uri']
-        username = request.data['username']
-        user = User.objects.get(username=username)
-        game_session = GameSession.objects.get(uri=uri)
-        player = game_session.players.filter(user=user, game_session=game_session)
-        if game_session.started and not player.exists():
-            return Response({
-                'status': 'ERROR',
-                'message': 'Game was already started'
-            })
-        else:
-            game_session.players.get_or_create(user=user, game_session=game_session)
-        services.send(uri, 'new_player_joined', game_session.to_json(), only_screen=True)
+        user = request.user
+        game = Game.objects.filter(uri=uri)
+
+        if not game.exists():
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        game = game.first()
+        player = game.players.filter(user=user, game=game)
+
+        if game.status != "PRE" and not player.exists() or game.players.count() == 5:
+            return Response(status=status.HTTP_403_FORBIDDEN)
+
+        game.players.get_or_create(user=user, game=game)
+        services.send(uri, 'update_players_list', game.to_json())
         return Response({
             'status': 'SUCCESS',
             'message': '%s joined game' % user.username,
-            'game': game_session.to_json()
+            'game': game.to_json()
         })
 
-
-class GameSessionTaskView(APIView):
-    permission_classes = (permissions.IsAuthenticated,)
-
-    def get(self, request, *args, **kwargs):
-        game_session = GameSession.objects.get(uri=kwargs['uri'])
-        tasks = [game_session_task.to_json()
-                 for game_session_task in game_session.tasks.all()]
-
-        return Response({'uri': game_session.uri, 'tasks': tasks})
-
-    def post(self, request, *args, **kwargs):
-        text = request.data['text']
+    def delete(self, request, *args, **kwargs):
+        game = Game.objects.get(uri=kwargs['uri'])
         user = request.user
-        game_session = GameSession.objects.get(uri=kwargs['uri'])
-        player = GameSessionPlayer.objects.filter(user=user, game_session=game_session).first()
 
-        GameSessionTask.objects.create(player=player, game_session=game_session, text=text)
+        if game.owner == user:
+            return Response({'status': 'SUCCESS', 'winners': services.end_game(game)})
 
-        return Response({'status': 'SUCCESS'})
+        else:
+            return Response(status=status.HTTP_403_FORBIDDEN)
 
 
-class GameSessionFirstTaskView(APIView):
+class AllRoundsView(APIView):
     permission_classes = (permissions.IsAuthenticated,)
 
     def get(self, request, *args, **kwargs):
-        game_session = GameSession.objects.get(uri=kwargs['uri'])
-        game_session_task = game_session.tasks.filter(done=False).first()
-        if game_session_task:
-            services.send(kwargs['uri'], 'new_trends_word', {'id': game_session_task.id, 'word': game_session_task.text}, only_controllers=True)
-            game_session_task.done = True
-            game_session_task.save()
-            return Response(game_session_task.to_json())
+        game = Game.objects.get(uri=kwargs['uri'])
+        rounds = [game_round.to_json()
+                  for game_round in game.rounds.all()]
+
+        return Response({'uri': game.uri, 'rounds': rounds})
+
+
+class FirstRoundView(APIView):
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def get(self, request, *args, **kwargs):
+        game = Game.objects.get(uri=kwargs['uri'])
+        first_round = game.rounds.filter(done=False).first()
+        if first_round:
+            game.status = Status.ANS.name
+            game.save()
+            services.send(kwargs['uri'], 'new_round',
+                          {'id': first_round.id, 'word': first_round.text}, only_controllers=True)
+            first_round.done = True
+            first_round.save()
+            return Response(first_round.to_json())
 
         return Response(status=status.HTTP_404_NOT_FOUND)
 
     def delete(self, request, *args, **kwargs):
-        game_session = GameSession.objects.get(uri=kwargs['uri'])
-        services.get_points(game_session)
+        game = Game.objects.get(uri=kwargs['uri'])
+        services.get_points(game)
 
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class GameSessionAnswerView(APIView):
+class AnswerView(APIView):
     permission_classes = (permissions.IsAuthenticated,)
 
     def get(self, request, *args, **kwargs):
-        game_session_task = GameSessionTask.objects.get(id=kwargs['task_id'])
-        answers = [game_session_answer.to_json()
-                   for game_session_answer in game_session_task.answers.all()]
+        game_round = Round.objects.get(id=kwargs['round_id'])
+        answers = [answer.to_json()
+                   for answer in game_round.answers.all()]
 
-        return Response({'id': game_session_task.id, 'answers': answers})
+        return Response({'id': game_round.id, 'answers': answers})
 
     def post(self, request, *args, **kwargs):
         text = request.data['text']
-        answer_type = request.data['type']
         user = request.user
-        game_session_task = GameSessionTask.objects.get(id=kwargs['task_id'])
-        player = GameSessionPlayer.objects.filter(user=user, game_session=game_session_task.game_session).first()
-        print("post")
-        GameSessionAnswer.objects.create(player=player, game_task=game_session_task, text=text, type=answer_type)
-        if services.check_if_last_answer(game_session_task):
-            services.send(game_session_task.game_session.uri, "all_answers", {}, only_screen=True)
+        game_round = Round.objects.get(id=kwargs['round_id'])
+        player = GamePlayer.objects.filter(user=user, game=game_round.game).first()
+        Answer.objects.create(player=player, game_round=game_round, text=text)
+
+        if services.check_if_last_answer(game_round):
+            services.send(game_round.game.uri, 'all_answers', {}, only_screen=True)
+
         return Response({'status': 'SUCCESS'})
 
 
-class GameSessionChoiceView(APIView):
+class UserView(APIView):
     permission_classes = (permissions.IsAuthenticated,)
 
     def get(self, request, *args, **kwargs):
-        game_session_task = GameSessionTask.objects.get(id=kwargs['task_id'])
-        choices = [game_session_choice.to_json()
-                   for game_session_choice in game_session_task.choices.all()]
+        user = request.user
 
-        return Response({'id': game_session_task.id, 'choices': choices})
+        return Response({'username': user.username,
+                         'email': user.email,
+                         'total_won': user.userstats.total_won,
+                         'total_score': user.userstats.total_score})
 
     def post(self, request, *args, **kwargs):
-        answer_id = request.data['answer_id']
         user = request.user
-        game_session_task = GameSessionTask.objects.get(id=kwargs['task_id'])
-        game_session_answer = GameSessionAnswer.objects.get(id=answer_id)
-        player = GameSessionPlayer.objects.filter(user=user, game_session=game_session_task.game_session).first()
+        user.username = request.data['username']
+        user.email = request.data['email']
+        try:
+            user.save()
+        except:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
 
-        GameSessionChoice.objects.create(player=player, game_task=game_session_task, choice=game_session_answer)
-
-        return Response({'status': 'SUCCESS'})
+        return Response({'status': 'SUCCESS',
+                         'username': user.username,
+                         'email': user.email})

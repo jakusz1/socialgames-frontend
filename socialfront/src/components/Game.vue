@@ -1,19 +1,21 @@
 <template>
-  <div class="d-flex flex-column flex-grow-1" v-if="sessionStarted">
+  <div class="d-flex flex-column flex-grow-1">
     <div v-if="mode == 'game'" class="d-flex flex-grow-1">
       <TrendsGame v-bind:graph="graph" v-bind:answers="answers" ref="gameView" />
     </div>
     <div v-else-if="mode == 'wait_for_start'" class="card-body">
-      <div class="card-header">{{ $t('waiting.title') }}</div>
+      <div class="card-header">
+        <h1>{{ $t('waiting.title') }}</h1>
+      </div>
+      <div class="card-footer">
+        <h1>{{ $t('_code') }} <b> {{ this.$route.params.uri }} </b></h1>
+      </div>
     </div>
-    <transition-group name="list-complete" tag="div" class="row">
-      <div v-for="player in players" :key="player.id" class="col-sm">
+    <transition-group name="flip-list" tag="div" class="row">
+      <div v-for="player in players" :key="player.id" class="col-sm text-5">
         {{player.username}} {{player.score}}
       </div>
     </transition-group>
-  </div>
-  <div v-else-if="!this.$route.params.uri">
-    <button @click="startGameSession" class="btn btn-primary btn-lg btn-block">{{$t('start.game')}}</button>
   </div>
 </template>
 
@@ -27,75 +29,44 @@ export default {
   },
   data () {
     return {
-      sessionStarted: false,
+      sessionStarted: true,
       mode: 'wait_for_start',
       players: [],
+      new_players: [],
       answers: [],
       graph: null,
       game: {},
       kek: '',
-      websocket: null
+      websocket: null,
+      code: '',
+      langs: ['pl_PL', 'en_US'],
+      game_lang: 'pl_PL'
     }
   },
 
   created () {
     this.username = sessionStorage.getItem('username')
-
-    // Setup headers for all requests
     $.ajaxSetup({
       headers: {
         'Authorization': `Token ${sessionStorage.getItem('authToken')}`
       }
     })
-    if (this.$route.params.uri) {
-      this.joinGameSession()
-    }
+    this.joinGameSession()
   },
   methods: {
-    startGameSession () {
-      window.jQuery.post('http://localhost:8000/api/games/', {game_type: 'tre'}, (data) => {
-        alert("A new session has been created you'll be redirected automatically")
-        this.sessionStarted = true
-        this.$router.push(`/games/${data.uri}/`)
-        this.joinGameSession()
-      })
-        .fail((response) => {
-          alert(response.responseText)
-        })
-    },
-    postMessage (event) {
-      const data = {message: this.message}
-
-      window.jQuery.post(`http://localhost:8000/api/games/${this.$route.params.uri}/messages/`, data, (data) => {
-        this.message = '' // clear the message after sending
-      })
-        .fail((response) => {
-          alert(response.responseText)
-        })
-    },
-    testM () {
-      debugger
-    },
     joinGameSession () {
       const uri = this.$route.params.uri
 
       $.ajax({
-        url: `http://localhost:8000/api/games/${uri}/`,
+        url: `http://${this.$backend}/api/games/${uri}/`,
         data: {username: this.username},
         type: 'PATCH',
         success: (data) => {
           const user = data.game.players.find((player) => player.username === this.username)
           this.game = data.game
-          debugger
           this.players = data.game.players
-          if (this.game.started) {
-            this.mode = 'game'
-          } else {
-            this.mode = 'wait_for_start'
-          }
+          this.start_game(this.game)
           if (user) {
-            // The user belongs/has joined the session
-            this.sessionStarted = true
             this.connectToWebSocket()
           }
         }
@@ -103,7 +74,7 @@ export default {
     },
 
     connectToWebSocket () {
-      this.websocket = new WebSocket(`ws://localhost:8000/ws/games/${this.$route.params.uri}`)
+      this.websocket = new WebSocket(`ws://${this.$backend}/ws/games/${this.$route.params.uri}`)
       this.websocket.onopen = this.onOpen
       this.websocket.onclose = this.onClose
       this.websocket.onmessage = this.onMessage
@@ -116,60 +87,62 @@ export default {
 
     onClose (event) {
       console.log('Connection closed.', event.data)
-
-      // Try and Reconnect after five seconds
       setTimeout(this.connectToWebSocket, 5000)
     },
 
     onMessage (event) {
-      debugger
       const data = JSON.parse(event.data)
       this[data.command](data.data)
     },
 
     start_game (data) {
-      this.mode = data.started ? 'game' : 'wait_for_start'
+      if (data.status === 'PRE') {
+        this.mode = 'wait_for_start'
+      } else {
+        this.mode = 'game'
+      }
     },
 
     results_graph (data) {
-      debugger
       this.graph = JSON.parse(data)
-      debugger
-      // this.game = data.game
     },
 
     results_answers (data) {
-      debugger
       this.answers = JSON.parse(data)
-      debugger
     },
 
     all_answers (data) {
       this.$refs.gameView.nextScreen()
-      debugger
     },
 
-    new_player_joined (data) {
+    update_players_list (data) {
       this.players = data.players
+    },
+
+    send_players_silent (data) {
+      this.new_players = data.players
+    },
+
+    update_new_players (data) {
+      this.players = this.new_players
+    },
+
+    go_back (data) {
+      this.$router.push(`/`)
     },
 
     onError (event) {
       alert('An error occured:', event.data)
     }
   }
-  // watch: {
-  //   mode: function (val) {
-  //     if (val === 'game') {
-  //       this.gameView = this.$children[0]
-  //       debugger
-  //     } else {
-  //       this.gameView = null
-  //     }
-  //   }
-  // }
 }
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+form input[type="text"] {
+    text-transform: lowercase;
+}
+.text-5{
+  font-size: 5vh;
+}
 </style>

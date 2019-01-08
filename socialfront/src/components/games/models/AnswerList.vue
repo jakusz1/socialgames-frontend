@@ -1,7 +1,7 @@
 <template>
   <div class="d-flex">
-    <div class="m-4" v-bind:key="answer.id" v-for="answer in answers">
-      <h4>{{answer.username}}</h4><h3>{{answer.text}} {{answer.score}}</h3>
+    <div class="m-4 answer" v-bind:key="answer.player_id" v-for="answer in answers">
+      <h3>{{answer.text}} {{answer.score}}</h3>
     </div>
   </div>
 </template>
@@ -23,4 +23,5 @@ export default {
 </script>
 
 <style>
+
 </style>

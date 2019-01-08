@@ -4,12 +4,9 @@ import Vue from 'vue'
 import App from './App'
 import router from './router'
 import { i18n } from '@/plugins/i18n'
-import VueVisible from 'vue-visible'
-
-Vue.use(VueVisible)
-// import 'animate.css/animate.min.css'
 
 Vue.config.productionTip = false
+Vue.prototype.$backend = 'localhost:8000'
 
 /* eslint-disable no-new */
 new Vue({

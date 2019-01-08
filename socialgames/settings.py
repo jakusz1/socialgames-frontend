@@ -24,7 +24,7 @@ SECRET_KEY = '=7j=f!#ef95h7v(5w92_p*qk(mun)x6o(*1+z^ym@sxj%jesju'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost', '192.168.1.111']
 
 # Application definition
 redis_host = os.environ.get('REDIS_HOST', 'localhost')
@@ -57,7 +57,6 @@ INSTALLED_APPS = [
     'corsheaders',
     'djoser',
     'game',
-    'notifications',
 
 ]
 
@@ -155,13 +154,3 @@ GAME_SETTINGS = {
     'code_length': 4,
     'controller_postfix': '_controller'
 }
-
-# # Celery settings
-# CELERY_TASK_ALWAYS_EAGER = True
-# CELERY_BROKER_URL = 'amqp://guest:guest@172.17.0.2:37502//'
-#
-# # notifications settings
-# NOTIFICATIONS_CHANNELS = {
-#     'websocket': 'game.channels.BroadcastWebSocketChannel',
-#     'console': 'notifications.channels.ConsoleChannel'
-# }

@@ -1,16 +1,13 @@
+import random
+import string
+from enum import Enum
+
+from django.contrib.auth.models import User
 from django.db import models
-from django.contrib.auth import get_user_model
-from django.conf import settings
-from channels.layers import get_channel_layer
-from asgiref.sync import async_to_sync
-from pytrends.request import TrendReq
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 from socialgames.settings import GAME_SETTINGS
-
-import string
-import random
-
-from enum import Enum
 
 
 class ChoiceEnum(Enum):
@@ -20,92 +17,92 @@ class ChoiceEnum(Enum):
 
 
 class Lang(ChoiceEnum):
-    EN = "en_US"
+    US = "en_US"
     PL = "pl_PL"
 
 
-class GameType(ChoiceEnum):
-    TRE = "Trends"
-
-
-User = get_user_model()
-
-
-def deserialize_player(player):
-    """Deserialize user instance to JSON"""
-    if player:
-        return {"id": player.user.id, "username": player.user.username, "score": player.score}
-    return {}
+class Status(ChoiceEnum):
+    PRE = "not_started"
+    IDL = "started_not_answering"
+    ANS = "started_answering"
 
 
 def _generate_unique_uri():
-    """Generates a unique uri for the game session"""
     all_chars = string.ascii_lowercase
-    return "".join(random.choice(all_chars) for _ in range(settings.GAME_SETTINGS["code_length"]))
+    return "".join(random.choice(all_chars) for _ in range(GAME_SETTINGS["code_length"]))
 
 
-class GameSession(models.Model):
-    """A Game Session. The uri"s length is defined in GAME_SETTINGS"""
-
-    owner = models.ForeignKey(User, on_delete=models.PROTECT)
-    uri = models.TextField(default=_generate_unique_uri)
-    game_type = models.CharField(max_length=3, choices=GameType.choices(), default=GameType.TRE)
-    lang = models.CharField(max_length=2, choices=Lang.choices(), default=Lang.EN)
-    started = models.BooleanField(default=False)
+class Game(models.Model):
+    owner = models.ForeignKey(User, on_delete=models.CASCADE)
+    uri = models.CharField(max_length=GAME_SETTINGS["code_length"],
+                           default=_generate_unique_uri)
+    lang = models.CharField(max_length=2,
+                            choices=Lang.choices(),
+                            default=Lang.PL.name)
+    status = models.CharField(max_length=3,
+                              choices=Status.choices(),
+                              default=Status.PRE.name)
 
     def to_json(self):
         return {"id": self.id,
-                "game_type": self.game_type,
                 "lang": self.lang,
-                "started": self.started,
-                "players": [deserialize_player(player) for player in self.players.all()],
-                "rounds": self.tasks.count()}
+                "status": self.status,
+                "players": [player.to_json()
+                            for player in self.players.all()],
+                "rounds": self.rounds.count()}
 
 
-class GameSessionPlayer(models.Model):
-    """Store all users in a game session."""
-
-    game_session = models.ForeignKey(
-        GameSession, related_name="players", on_delete=models.CASCADE
+class GamePlayer(models.Model):
+    game = models.ForeignKey(
+        Game, related_name="players", on_delete=models.CASCADE
     )
-    user = models.ForeignKey(User, on_delete=models.PROTECT)
-    score = models.IntegerField(default=0, null=False)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    score = models.IntegerField(default=0)
 
     def to_json(self):
-        return {"id": self.id, "username": self.user.username, "score": self.score}
+        return {"id": self.id,
+                "username": self.user.username,
+                "email": self.user.email,
+                "score": self.score,
+                "total_score": self.user.userstats.total_score,
+                "total_won": self.user.userstats.total_won}
 
 
-class GameSessionTask(models.Model):
-    player = models.ForeignKey(GameSessionPlayer, on_delete=models.CASCADE, null=True)
-    game_session = models.ForeignKey(GameSession, related_name="tasks", on_delete=models.CASCADE)
-    text = models.TextField(max_length=2000)
+class Round(models.Model):
+    game = models.ForeignKey(Game, related_name="rounds", on_delete=models.CASCADE)
+    text = models.TextField(max_length=50)
     done = models.BooleanField(default=False)
 
     def to_json(self):
-        return {"id": self.id, "player": deserialize_player(self.player), "text": self.text, "done": self.done}
+        return {"id": self.id, "text": self.text, "done": self.done}
 
 
-class GameSessionAnswer(models.Model):
-    player = models.ForeignKey(GameSessionPlayer, on_delete=models.CASCADE)
-    game_task = models.ForeignKey(GameSessionTask, related_name="answers", on_delete=models.CASCADE)
-    text = models.TextField(max_length=2000)
-    type = models.TextField(max_length=10, default="text")
-    score = models.IntegerField(default=0, null=False)
+class Answer(models.Model):
+    player = models.ForeignKey(GamePlayer, on_delete=models.CASCADE)
+    game_round = models.ForeignKey(Round, related_name="answers", on_delete=models.CASCADE)
+    text = models.TextField(max_length=100)
+    score = models.IntegerField(default=0)
 
     def to_json(self):
         return {"username": self.player.user.username,
+                "player_id": self.player.id,
                 "id": self.id,
-                "type": self.type,
                 "text": self.text,
                 "score": self.score}
 
 
-class GameSessionChoice(models.Model):
-    player = models.ForeignKey(GameSessionPlayer, on_delete=models.CASCADE)
-    game_task = models.ForeignKey(
-        GameSessionTask, related_name="choices", on_delete=models.CASCADE
-    )
-    choice = models.ForeignKey(GameSessionAnswer, on_delete=models.CASCADE)
+class UserStats(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    total_won = models.IntegerField(default=0)
+    total_score = models.IntegerField(default=0)
 
-    def to_json(self):
-        return {"player": deserialize_player(self.player), "choice": self.game_task.to_json()}
+
+@receiver(post_save, sender=User)
+def create_user_stats(sender, instance, created, **kwargs):
+    if created:
+        UserStats.objects.create(user=instance)
+
+
+@receiver(post_save, sender=User)
+def save_user_stats(sender, instance, **kwargs):
+    instance.userstats.save()

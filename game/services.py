@@ -1,12 +1,13 @@
+import datetime
 import json
 
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
-from pytrends.request import TrendReq
-import pytrends.exceptions
 from faker import Faker
+from pytrends.request import TrendReq
+from django.contrib.auth.models import User
 
-from game.models import GameSessionTask, deserialize_player, Lang, GameSession, GameType
+from game.models import Round, Lang, Status
 from socialgames.settings import GAME_SETTINGS
 
 
@@ -27,71 +28,101 @@ def send(uri, command, data, only_screen=False, only_controllers=False):
                                                  }})
 
 
-def start_game(game_session, *args):
+def start_game(game, *args):
     if not args:
-        faker = Faker("pl_PL" if game_session.lang == "Lang.PL" else "en_US")
-        args = faker.words(nb=3, ext_word_list=None)
+        faker = Faker(Lang[game.lang].value)
+        args = faker.words(nb=10, ext_word_list=None)
 
     for arg in args:
-        GameSessionTask.objects.create(game_session=game_session, text=arg)
+        Round.objects.create(game=game, text=arg)
 
-    game_session.started = True
-    game_session.save()
-    # send_question(game_session)
-
-
-def check_if_last_answer(game_task):
-    if game_task.game_session.game_type == "GameType.TRE":
-        return game_task.game_session.players.count() == game_task.answers.count()
-    else:  # TODO implement for more advanced games
-        return False
+    game.status = "IDL"
+    game.save()
 
 
-def send_question(game_session):
-    task = game_session.tasks.filter(done=False).first()
-    if task:
-        send(game_session.uri, 'new_task', task.to_json())
-        task.done = True
-        task.save()
+def check_if_last_answer(game_round):
+    return game_round.game.players.count() == game_round.answers.count()
+
+
+def send_question(game):
+    game_round = game.rounds.filter(done=False).first()
+    if game_round:
+        send(game.uri, 'new_round', game_round.to_json())
+        game_round.done = True
+        game_round.game.status = "ANS"
+        game_round.save()
         return True
     return False
 
 
-def get_points(game_session):
-    pytrends = TrendReq(hl='US', tz=0)
-    task = game_session.tasks.filter(done=True).first()
-    if task:
-        answers_checklist = []
-        players_list = []
-        answers = task.answers.all()
-        for answer in answers:
-            answers_checklist.append(answer.text)
-            players_list.append(answer.player)
+def get_points(game):
+    game_round = game.rounds.filter(done=True).first()
+    if game_round:
+        game.status = Status.IDL.name
+        game.save()
+        pytrends = TrendReq(hl=game.lang, tz=0)
+
+        answers = game_round.answers.order_by("player_id").all()
+        answers_text_list = [answer.text for answer in answers]
+
+        now = datetime.datetime.now()
+        date = now - datetime.timedelta(days=365)
+
         try:
-            pytrends.build_payload(answers_checklist, cat=0, timeframe='today 3-m', geo='US', gprop='')
+            pytrends.build_payload(answers_text_list, cat=0,
+                                   timeframe=date.strftime("%Y-%m-%d") + ' ' + now.strftime("%Y-%m-%d"),
+                                   geo=game.lang,
+                                   gprop='')
             scrapped_df = pytrends.interest_over_time()
         except:
+            send(game.uri, "results_graph", "{}",
+                 only_screen=True)
+            send(game.uri, "results_answers", json.dumps([answer.to_json() for answer in answers]),
+                 only_screen=True)
+            game_round.delete()
             return False
 
         if scrapped_df.size != 0:
-            scrapped_df = scrapped_df.drop(columns='isPartial')
-
-            scores = scrapped_df.iloc[-1]
-            for i in range(len(scores)):
-                players_list[i].score += scores[i]
-                players_list[i].save()
-                answer = answers[i]
-                answer.score = int(scores[i])
+            scrapped_df = scrapped_df.drop(columns='isPartial')[:-1]
+            scores = dict(zip(scrapped_df.columns.values.tolist(), scrapped_df.iloc[-1]))
+            for answer in answers:
+                answer.score = int(scores.get(answer.text))
+                answer.player.score += int(scores.get(answer.text))
                 answer.save()
+                answer.player.save()
 
             print(json.dumps([answer.to_json() for answer in answers]))
-            send(game_session.uri, "results_graph", '{'+scrapped_df.to_json(orient="split")[1:-1]+'}',
+            send(game.uri, "results_graph", '{' + scrapped_df.to_json(orient="split")[1:-1] + '}',
                  only_screen=True)
-            send(game_session.uri, "results_answers", json.dumps([answer.to_json() for answer in answers]),
+            send(game.uri, "results_answers", json.dumps([answer.to_json() for answer in answers]),
                  only_screen=True)
+            send(game.uri, "send_players_silent", game.to_json(), only_screen=True)
 
-            task.delete()
+            game_round.delete()
             return True
+
         else:
+            send(game.uri, "results_graph", "{}",
+                 only_screen=True)
+            send(game.uri, "results_answers", json.dumps([answer.to_json() for answer in answers]),
+                 only_screen=True)
+            game_round.delete()
             return False
+
+    send(game.uri, 'go_back', {})
+    game.delete()
     return False
+
+
+def end_game(game):
+    final_players_list_json = []
+    for index, player in enumerate(game.players.order_by("-score").all()):
+        final_players_list_json.append(player.to_json())
+        player.user.userstats.total_score += player.score
+        if index == 0:
+            player.user.userstats.total_won += 1
+        player.user.save()
+
+    send(game.uri, 'go_back', {}, only_controllers=True)
+    game.delete()
+    return final_players_list_json

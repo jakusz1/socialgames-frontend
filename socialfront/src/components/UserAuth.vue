@@ -47,7 +47,7 @@
 </template>
 
 <script>
-const $ = window.jQuery // JQuery
+const $ = window.jQuery
 
 export default {
 
@@ -58,29 +58,24 @@ export default {
   },
   methods: {
     signUp () {
-      $.post('http://localhost:8000/auth/users/create/', this.$data, (data) => {
-        alert('Your account has been created. You will be signed in automatically')
+      $.post(`http://${this.$backend}/auth/users/create/`, this.$data, (data) => {
         this.signIn()
       })
         .fail((response) => {
-          alert(response.responseText)
+          alert(this.$t('sign.error'))
         })
     },
 
     signIn () {
       const credentials = {username: this.username, password: this.password}
 
-      $.post('http://localhost:8000/auth/token/create/', credentials, (data) => {
+      $.post(`http://${this.$backend}/auth/token/create/`, credentials, (data) => {
         sessionStorage.setItem('authToken', data.auth_token)
         sessionStorage.setItem('username', this.username)
-        if (this.$route.query.from) {
-          this.$router.push(this.$route.query.from)
-        } else {
-          this.$router.push('/games')
-        }
+        this.$router.push('/')
       })
         .fail((response) => {
-          alert(response.responseText)
+          alert(this.$t('log.error'))
         })
     }
   }

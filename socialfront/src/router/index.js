@@ -3,6 +3,8 @@ import Router from 'vue-router'
 import UserAuth from '@/components/UserAuth'
 import Game from '@/components/Game'
 import Controller from '@/components/Controller'
+import Profile from '@/components/Profile'
+import Main from '@/components/Main'
 
 Vue.use(Router)
 
@@ -22,6 +24,16 @@ const router = new Router({
       path: '/auth',
       name: 'UserAuth',
       component: UserAuth
+    },
+    {
+      path: '/profile',
+      name: 'Profile',
+      component: Profile
+    },
+    {
+      path: '/',
+      name: 'Main',
+      component: Main
     }
   ]
 })
@@ -33,8 +45,7 @@ router.beforeEach((to, from, next) => {
   } else if (sessionStorage.getItem('authToken') !== null || to.path === '/auth') {
     next()
   } else {
-    // next('/auth')
-    next({ path: '/auth', query: { from: to.path } })
+    next('/auth')
   }
 })
 
