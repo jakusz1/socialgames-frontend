@@ -1,27 +1,33 @@
 <template>
-  <div class="container">
-    <div class="card-body">
-      <div class="card-header">
-        <h2>{{$t('start.new_game_title')}}</h2>
+  <div class="container my-auto">
+    <div class="row">
+      <div class="col">
+    <div class="card text-white bg-primary mt-2">
+      <div class="card-header text-left">
+        <h3>{{$t('start.new_game_title')}}</h3>
       </div>
-      <div class="card-footer">
-        <form @submit.prevent="startGame" class="form-inline">
+      <div class="card-body">
+        <form @submit.prevent="startGame" class="form-group">
           <select v-model="game_lang" class="form-control form-control-lg">
-            <option v-for="(lang, i) in langs" :key="`Lang${i}`" :value="lang">{{ lang }}</option>
+            <option v-for="(lang, i) in langs" :key="`loc${i}`" :value="lang">{{$t("loc."+lang)}}</option>
           </select>
-          <button class="btn btn-success btn-lg">{{$t('start.btn')}}</button>
+          <button class="btn btn-outline-light btn-lg btn-block mt-2">{{$t('start.btn')}}</button>
         </form>
       </div>
     </div>
-    <div class="card-body">
-      <div class="card-header">
-        <h2>{{$t('controller.connect_title')}}</h2>
       </div>
-      <div class="card-footer">
-        <form @submit.prevent="startController" class="form-inline">
+      <div class="col">
+    <div class="card text-white bg-success mt-2">
+      <div class="card-header text-left">
+        <h3>{{$t('controller.connect_title')}}</h3>
+      </div>
+      <div class="card-body">
+        <form @submit.prevent="startController" class="form-group">
           <input pattern=".{4}" required :title="$t('code.length')" v-model="code" class="form-control form-control-lg" type="text" :placeholder="$t('controller.code')" />
-          <button class="btn btn-success btn-lg">{{$t('controller.join')}}</button>
+          <button class="btn btn-outline-light btn-lg btn-block mt-2">{{$t('controller.join')}}</button>
         </form>
+      </div>
+    </div>
       </div>
     </div>
   </div>
@@ -41,8 +47,8 @@ export default {
       game: {},
       websocket: null,
       code: '',
-      langs: ['pl_PL', 'en_US'],
-      game_lang: 'pl_PL'
+      langs: ['en_US', 'pl_PL'],
+      game_lang: 'en_US'
     }
   },
 

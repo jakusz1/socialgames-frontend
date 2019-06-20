@@ -23,7 +23,7 @@
     "controller":{
         "connect_title":"Dołącz do istniejącej gry",
         "join":"Dołącz",
-        "code":"Wpisz kod gry"
+        "code":"kod gry"
     },
     "waiting":{
         "title":"Oczekiwanie na rozpoczęcie gry",
@@ -55,10 +55,17 @@
         "score":"Całkowity wynik",
         "won":"Wygranych"
     },
-    "edit_profile":"Edytuj profil",
+    "profile":{
+        "header":"Twój profil",
+        "edit":"Edytuj profil"
+    },
     "save":"Zapisz",
     "discard":"Anuluj",
     "pts":"pkt",
     "no_data":"Zbyt mało wyszukiwań podanych fraz!",
-    "inprog":"Poczekaj na nową rundę!"
+    "inprog":"Poczekaj na nową rundę!",
+    "loc":{
+        "pl_PL":"Polska",
+        "en_US":"USA"
+    }
 }

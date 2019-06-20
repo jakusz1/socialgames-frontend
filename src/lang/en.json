@@ -23,7 +23,7 @@
     "controller":{
         "connect_title":"Join existing game",
         "join":"Join",
-        "code":"Type your game code"
+        "code":"game code"
     },
     "waiting":{
         "title":"Waiting for game to start",
@@ -55,10 +55,17 @@
         "score":"Total score",
         "won":"Total won"
     },
-    "edit_profile":"Edit profile",
+    "profile":{
+        "header":"Your profile",
+        "edit":"Edit profile"
+    },
     "save":"Save",
     "discard":"Discard",
     "pts":"pts",
     "no_data":"Not enough searches for this phrases!",
-    "inprog":"Wait for the next round!"
+    "inprog":"Wait for the next round!",
+    "loc":{
+        "pl_PL":"Poland",
+        "en_US":"USA"
+    }
 }

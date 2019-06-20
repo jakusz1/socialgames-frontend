@@ -1,5 +1,9 @@
 <template>
-  <div class="container">
+  <div class="container my-auto">
+    <div class="card bg-light text-left">
+      <div class="card-header">
+        <h3>{{$t('profile.header')}}</h3>
+      </div>
     <div v-if="edit_mode" class="card-body">
       <form v-on:submit.prevent>
         <div class="form-group row">
@@ -45,7 +49,8 @@
           </div>
         </div>
       </form>
-      <button class="btn btn-secondary" @click='editMode()'>{{$t('edit_profile')}}</button>
+      <button class="btn btn-secondary btn-block" @click='editMode()'>{{$t('profile.edit')}}</button>
+    </div>
     </div>
   </div>
 </template>
