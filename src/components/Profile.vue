@@ -2,7 +2,7 @@
   <div class="container my-auto">
     <div class="card bg-light text-left">
       <div class="card-header">
-        <h3>{{$t('profile.header')}}</h3>
+        {{$t('profile.header')}}
       </div>
     <div v-if="edit_mode" class="card-body">
       <form v-on:submit.prevent>

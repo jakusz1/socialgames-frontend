@@ -46,4 +46,7 @@ export default {
   color: #2c3e50;
   height: inherit;
 }
+.card .card-header {
+  font-size: 1.5rem
+}
 </style>

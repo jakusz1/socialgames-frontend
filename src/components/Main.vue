@@ -4,7 +4,7 @@
       <div class="col">
     <div class="card text-white bg-primary mt-2">
       <div class="card-header text-left">
-        <h3>{{$t('start.new_game_title')}}</h3>
+        {{$t('start.new_game_title')}}
       </div>
       <div class="card-body">
         <form @submit.prevent="startGame" class="form-group">
@@ -19,7 +19,7 @@
       <div class="col">
     <div class="card text-white bg-success mt-2">
       <div class="card-header text-left">
-        <h3>{{$t('controller.connect_title')}}</h3>
+        {{$t('controller.connect_title')}}
       </div>
       <div class="card-body">
         <form @submit.prevent="startController" class="form-group">
