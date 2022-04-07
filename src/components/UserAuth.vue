@@ -58,7 +58,7 @@ export default {
   },
   methods: {
     signUp () {
-      $.post(`http://${this.$backend}/auth/users/create/`, this.$data, (data) => {
+      $.post(`http://${this.$backend}/auth/users/`, this.$data, (data) => {
         this.signIn()
       })
         .fail((response) => {
@@ -69,7 +69,7 @@ export default {
     signIn () {
       const credentials = {username: this.username, password: this.password}
 
-      $.post(`http://${this.$backend}/auth/token/create/`, credentials, (data) => {
+      $.post(`http://${this.$backend}/auth/token/login/`, credentials, (data) => {
         sessionStorage.setItem('authToken', data.auth_token)
         sessionStorage.setItem('username', this.username)
         this.$router.push('/')
