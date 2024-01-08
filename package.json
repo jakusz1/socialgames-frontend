@@ -17,10 +17,10 @@
   "dependencies": {
     "animate.css": "^3.7.0",
     "apexcharts": "^3.40.0",
-    "chart.js": "^4.3.0",
+    "chart.js": "^2.7.3",
     "moment": "^2.23.0",
     "vue": "^2.7.14",
-    "vue-chartjs": "^5.2.0",
+    "vue-chartjs": "^3.4.0",
     "vue-i18n": "^8.3.1",
     "vue-router": "^3.0.1",
     "vue-visible": "^1.0.2"
