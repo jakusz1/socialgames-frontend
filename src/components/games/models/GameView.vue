@@ -53,7 +53,7 @@ export default {
         this.currentScreenIndex++
       }
     },
-    between: function (from, to) {
+    between: function (from = 0, to = Number.MAX_VALUE) {
       return this.currentScreen && this.currentScreen.screenTimer >= from && this.currentScreen.screenTimer <= to
     },
     timer: function () {

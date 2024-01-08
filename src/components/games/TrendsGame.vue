@@ -23,9 +23,13 @@
         <h2 key="0">{{ $t('endans') }}</h2>
       </screen>
       <screen :key="index*10+4" :duration="20" :onStartFun="update_new_players">
-        <div key="0.1" class="chart-container"><chart v-if="graph" v-bind:chartdata="graph" v-bind:options="options"></chart></div>
-        <div key="0.0">
-          <answerlist v-if="answers" v-bind:answers="answers"></answerlist>
+        <div key="0" class="d-flex flex-grow-1 align-items-center">
+          <div key="1" class="chart-container flex-grow-1">
+            <chart v-if="graph" v-bind:chartdata="graph" v-bind:options="options"></chart>
+          </div>
+          <div key="2" class="d-flex">
+            <answerlist v-if="answers" v-bind:answers="answers"></answerlist>
+          </div>
         </div>
       </screen>
     </template>
@@ -112,7 +116,6 @@ h5 {
   font-family: 'KoHo', sans-serif;
 }
 .chart-container {
-  max-width: 800px;
-  margin:  0 auto;
+  width: 80vw;
 }
 </style>

@@ -2,12 +2,15 @@
 /* eslint-disable */
 import { Line } from 'vue-chartjs'
 import moment from 'moment'
+import Vue from 'vue'
+
 
 export default {
   extends: Line,
   props: {
     chartdata: { default: null },
-    options: { default: null }
+    options: { default: null },
+    cssClasses: { default: "chart"}
   },
   data() {
     return {
@@ -28,28 +31,22 @@ export default {
         datasets: datasets
       }
       this.renderChart(x, {
-        animations: {
-            tension: {
-                duration: 200,
-                easing: 'linear',
-                from: 3,
-                to: 0,
-                loop: true
-            }
-        },
         responsive: true,
         maintainAspectRatio: false,
+        layout: {
+            padding: {
+                right: 30,
+            }
+        },
         scales: {
           xAxes: [{
             type: 'time',
             time: {
-              displayFormats: {
-                quarter: 'MMM YYYY'
-              }
-            },
+                    unit: 'quarter'
+                },
             ticks: {
-              fontSize: 20,
-              fontFamily: 'KoHo'
+              fontSize: 25,
+              fontFamily: 'KoHo',
             },
             gridLines: {
               display: false
@@ -69,7 +66,6 @@ export default {
     }
   }
 }
-const colors = ['#fd7e14', '#007bff', '#6f42c1', '#28a745', '#17a2b8'];
 
 function prepareDatasets(djangoDataset, playersCount) {
   const datasets = [];
@@ -77,14 +73,15 @@ function prepareDatasets(djangoDataset, playersCount) {
     let values = djangoDataset.data.map(function (el) { return el[i] });
     let dataset = {
       label: djangoDataset.columns[i],
-      borderColor: colors[i],
-      backgroundColor: colors[i] + '33',
-      borderWidth: 1,
-      pointRadius: 0,
-      data: values,
-      gridLines: {
-        display: false
+      borderColor: Vue.prototype.$colors[i],
+      backgroundColor: Vue.prototype.$colors[i] + '33',
+      borderWidth: 5,
+      pointBackgroundColor: Vue.prototype.$colors[i],
+      pointRadius: function(context) {
+        var index = context.dataIndex;
+        return index === values.length-1 ? 12 : 0;
       },
+      data: values,
     };
     datasets.push(dataset);
   }
@@ -92,4 +89,8 @@ function prepareDatasets(djangoDataset, playersCount) {
 }
 </script>
 
-<style></style>
+<style>
+.chart {
+  height: 75vh;
+}
+</style>

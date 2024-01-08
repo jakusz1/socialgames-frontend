@@ -7,6 +7,7 @@ import { i18n } from '@/plugins/i18n'
 
 Vue.config.productionTip = false
 Vue.prototype.$backend = 'localhost:8000'
+Vue.prototype.$colors = ['#fd7e14', '#007bff', '#6f42c1', '#28a745', '#17a2b8']
 
 /* eslint-disable no-new */
 new Vue({
