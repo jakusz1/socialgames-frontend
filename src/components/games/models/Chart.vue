@@ -35,7 +35,9 @@ export default {
         maintainAspectRatio: false,
         layout: {
             padding: {
+                top: 10,
                 right: 30,
+                left: 60
             }
         },
         scales: {
@@ -45,7 +47,7 @@ export default {
                     unit: 'quarter'
                 },
             ticks: {
-              fontSize: 25,
+              fontSize: 35,
               fontFamily: 'KoHo',
             },
             gridLines: {
@@ -55,7 +57,7 @@ export default {
           yAxes: [{
             display: false,
             gridLines: {
-              display: false
+              display: true
             }
           }]
         },
