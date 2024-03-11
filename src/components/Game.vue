@@ -8,12 +8,16 @@
         <h1>{{ $t('waiting.title') }}</h1>
       </div>
       <div class="card-footer">
-        <h1>{{ $t('_code') }} <b> {{ this.$route.params.uri }} </b></h1>
+        <a style="font-size: 4vh;">{{ $t('_code') }}:</a> <a style="font-size: 16vh;"> {{ this.$route.params.uri }} </a>
       </div>
     </div>
     <transition-group name="flip-list" tag="div" class="row">
-      <div v-for="player in players" :key="player.id" class="col-sm text-5">
-        {{player.username}} {{player.score}}
+      <div v-for="(player, index) in players" :key="player.id" class="col-sm text-5">
+        <h1 v-bind:style="{ color: $colors[index] }">{{player.username}}</h1>
+      </div>
+      <div v-if="mode == 'game'" :key=111111 class="ml-auto align-self-center">
+        <button type="button" class="btn btn-outline-secondary btn-lg" @click='pause_step()'>►❚❚</button>
+        <button type="button" style="margin-right: 1vw;" class="btn btn-outline-secondary btn-lg" @click='skip_current_step()'>►►</button>
       </div>
     </transition-group>
   </div>
@@ -36,7 +40,6 @@ export default {
       answers: [],
       graph: null,
       game: {},
-      kek: '',
       websocket: null,
       code: '',
       langs: ['pl_PL', 'en_US'],
@@ -74,11 +77,13 @@ export default {
     },
 
     connectToWebSocket () {
-      this.websocket = new WebSocket(`ws://${this.$backend}/ws/games/${this.$route.params.uri}`)
-      this.websocket.onopen = this.onOpen
-      this.websocket.onclose = this.onClose
-      this.websocket.onmessage = this.onMessage
-      this.websocket.onerror = this.onError
+      if (this.$route.params.uri) {
+        this.websocket = new WebSocket(`ws://${this.$backend}/ws/games/${this.$route.params.uri}`)
+        this.websocket.onopen = this.onOpen
+        this.websocket.onclose = this.onClose
+        this.websocket.onmessage = this.onMessage
+        this.websocket.onerror = this.onError
+      }
     },
 
     onOpen (event) {
@@ -133,6 +138,14 @@ export default {
 
     onError (event) {
       alert('An error occured:', event.data)
+    },
+
+    skip_current_step () {
+      this.$refs.gameView.currentScreen.forward()
+    },
+
+    pause_step () {
+      this.$refs.gameView.currentScreen.switch_pause()
     }
   }
 }
@@ -144,5 +157,9 @@ form input[type="text"] {
 }
 .text-5{
   font-size: 5vh;
+}
+@import url('https://fonts.googleapis.com/css?family=Indie+Flower|KoHo:600');
+div {
+  font-family: 'KoHo', sans-serif;
 }
 </style>
