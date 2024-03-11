@@ -1,12 +1,13 @@
 <template>
   <div class="container my-auto">
     <div class="row">
-      <div class="col">
+      <div class="col-md">
     <div class="card text-white bg-primary mt-2">
       <div class="card-header text-left">
         {{$t('start.new_game_title')}}
       </div>
-      <div class="card-body">
+      <div class="card-body text-left">
+        <p class="card-text">{{$t('start.new_game_body')}}</p>
         <form @submit.prevent="startGame" class="form-group">
           <select v-model="game_lang" class="form-control form-control-lg">
             <option v-for="(lang, i) in langs" :key="`loc${i}`" :value="lang">{{$t("loc."+lang)}}</option>
@@ -16,12 +17,13 @@
       </div>
     </div>
       </div>
-      <div class="col">
+      <div class="col-md">
     <div class="card text-white bg-success mt-2">
       <div class="card-header text-left">
         {{$t('controller.connect_title')}}
       </div>
-      <div class="card-body">
+      <div class="card-body text-left">
+        <p class="card-text">{{$t('controller.connect_body')}}</p>
         <form @submit.prevent="startController" class="form-group">
           <input pattern=".{4}" required :title="$t('code.length')" v-model="code" class="form-control form-control-lg" type="text" :placeholder="$t('controller.code')" />
           <button class="btn btn-outline-light btn-lg btn-block mt-2">{{$t('controller.join')}}</button>
@@ -48,7 +50,7 @@ export default {
       websocket: null,
       code: '',
       langs: ['en_US', 'pl_PL'],
-      game_lang: 'en_US'
+      game_lang: 'pl_PL'
     }
   },
 
@@ -64,7 +66,7 @@ export default {
   },
   methods: {
     startGame () {
-      window.jQuery.post(`http://${this.$backend}/api/games/`, {lang: this.game_lang}, (data) => {
+      $.post(`http://${this.$backend}/api/games/`, {lang: this.game_lang}, (data) => {
         this.$router.push(`/games/${data.uri}/`)
       })
         .fail((response) => {
