@@ -26,7 +26,7 @@
           <div class="tab-pane fade" id="signup" role="tabpanel" aria-labelledby="signin-tab">
             <form @submit.prevent="signUp">
               <div class="form-group">
-                <input v-model="email" type="email" class="form-control" :placeholder="$t('email')" required>
+                <input v-model="email" type="email" class="form-control" :placeholder="$t('email')">
               </div>
               <div class="form-row">
                 <div class="form-group col-md-6">

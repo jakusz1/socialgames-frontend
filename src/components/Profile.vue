@@ -37,13 +37,13 @@
           </div>
         </div>
       <div class="form-group row">
-          <label for="staticWon" class="col-sm-2 col-form-label">{{$t('total.won')}}</label>
+          <label for="staticWon" class="col-sm-2 col-form-label">{{$t('total_won')}}</label>
           <div class="col-sm-10">
             <input type="number" readonly class="form-control-plaintext" id="staticWon" v-model="total_won">
           </div>
         </div>
       <div class="form-group row">
-          <label for="staticScore" class="col-sm-2 col-form-label">{{$t('total.score')}}</label>
+          <label for="staticScore" class="col-sm-2 col-form-label">{{$t('total_score')}}</label>
           <div class="col-sm-10">
             <input type="number" readonly class="form-control-plaintext" id="staticScore" v-model="total_score">
           </div>
