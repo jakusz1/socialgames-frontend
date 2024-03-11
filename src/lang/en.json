@@ -18,12 +18,15 @@
     "start":{
         "game":"Start game",
         "new_game_title":"Start a new game",
+        "new_game_body":"Choose the search region:",
         "btn":"Start"
     },
     "controller":{
         "connect_title":"Join existing game",
+        "connect_body":"Provide 4 symbol code of the already created game:",
         "join":"Join",
-        "code":"game code"
+        "code":"game code",
+        "error":"Game with provided code does not exist"
     },
     "waiting":{
         "title":"Waiting for game to start",
@@ -31,7 +34,9 @@
     },
     "username":"Username",
     "password":"Password",
-    "email":"Email",
+    "email":"Email (not required)",
+    "total_won": "Total won",
+    "total_score": "Total score",
     "send":"Send",
     "hello":"Hello",
     "_code":"code",
@@ -45,15 +50,19 @@
             "title":"Rules",
             "text":"Prepare the most searched phrase with a provided word!"
         },
+        "round": "Round ",
+        "multiplier1": "Now points are doubled!",
+        "multiplier2": "Now points are tripled!",
         "rd4q": "Get ready for the word nr {0}!"
     },
     "winner": " won!",
     "code":{
         "length":"Code has 4 letters"
     },
-    "total":{
-        "score":"Total score",
-        "won":"Total won"
+    "skip_screen": "Fast-forward >",
+    "score":{
+        "round":"Current score",
+        "final":"Final score"
     },
     "profile":{
         "header":"Your profile",
