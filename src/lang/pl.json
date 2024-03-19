@@ -1,6 +1,6 @@
 {
     "app":{
-        "name":"SocialGames PL"
+        "name":"TrendsGame"
     },
     "sign":{
         "up":"Zarejestruj się",
@@ -29,8 +29,10 @@
         "error":"Gra o podanym kodzie nie istnieje"
     },
     "waiting":{
-        "title":"Oczekiwanie na rozpoczęcie gry",
-        "players":"Połączeni gracze"
+        "title":"Wpisz kod gry",
+        "open":"Zeskanuj",
+        "players":"Połączeni gracze",
+        "or": "lub"
     },
     "username":"Nazwa użytkownika",
     "password":"Hasło",

@@ -72,7 +72,7 @@ export default {
       $.post(`http://${this.$backend}/auth/token/login/`, credentials, (data) => {
         sessionStorage.setItem('authToken', data.auth_token)
         sessionStorage.setItem('username', this.username)
-        this.$router.push('/')
+        this.$router.push(this.$route.query.from ? this.$route.query.from : '/')
       })
         .fail((response) => {
           alert(this.$t('log.error'))

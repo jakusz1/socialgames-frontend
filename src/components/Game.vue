@@ -3,12 +3,29 @@
     <div v-if="mode == 'game'" class="d-flex flex-grow-1">
       <TrendsGame v-bind:graph="graph" v-bind:answers="answers" ref="gameView" />
     </div>
-    <div v-else-if="mode == 'wait_for_start'" class="card-body">
-      <div class="card-header">
-        <h1>{{ $t('waiting.title') }}</h1>
-      </div>
-      <div class="card-footer">
-        <a style="font-size: 4vh;">{{ $t('_code') }}:</a> <a style="font-size: 16vh;"> {{ this.$route.params.uri }} </a>
+    <div v-else-if="mode == 'wait_for_start'" class="container my-auto">
+      <div class="card-deck">
+          <div class="card bg-light">
+            <div class="card-header text-left">
+              <h1>{{ $t('waiting.open') }}</h1>
+            </div>
+            <div class="card-body">
+              <QrcodeVue :value="joinUrl" size=300 foreground="#2c3e50"></QrcodeVue>
+            </div>
+          </div>
+          <div class="card border-0">
+            <div class="my-auto">
+              <a style="font-size: 8vh;"> {{ $t('waiting.or') }} </a>
+            </div>
+          </div>
+          <div class="card bg-light">
+            <div class="card-header text-left">
+              <h1>{{ $t('waiting.title') }}</h1>
+            </div>
+            <div class="card-body">
+              <a style="font-size: 12vh;"> {{ this.$route.params.uri }} </a>
+            </div>
+        </div>
       </div>
     </div>
     <transition-group name="flip-list" tag="div" class="row">
@@ -25,11 +42,13 @@
 
 <script>
 import TrendsGame from './games/TrendsGame.vue'
+import QrcodeVue from 'qrcode.vue'
 const $ = window.jQuery
 
 export default {
   components: {
-    TrendsGame
+    TrendsGame,
+    QrcodeVue
   },
   data () {
     return {
@@ -43,7 +62,8 @@ export default {
       websocket: null,
       code: '',
       langs: ['pl_PL', 'en_US'],
-      game_lang: 'pl_PL'
+      game_lang: 'pl_PL',
+      joinUrl: window.location.href.replace('games', 'controllers')
     }
   },
 

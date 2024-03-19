@@ -7,14 +7,14 @@
     <div v-if="edit_mode" class="card-body">
       <form v-on:submit.prevent>
         <div class="form-group row">
-          <label for="username" class="col-sm-2 col-form-label">{{$t('username')}}</label>
-          <div class="col-sm-10">
+          <label for="username" class="col-sm-4 col-form-label">{{$t('username')}}</label>
+          <div class="col-sm-8">
             <input type="text" class="form-control" id="username" v-model="new_username">
           </div>
         </div>
         <div class="form-group row">
-          <label for="email" class="col-sm-2 col-form-label">{{$t('email')}}</label>
-          <div class="col-sm-10">
+          <label for="email" class="col-sm-4 col-form-label">{{$t('email')}}</label>
+          <div class="col-sm-8">
             <input type="text" class="form-control" id="email" v-model="new_email">
           </div>
         </div>
@@ -25,26 +25,26 @@
     <div v-else class="card-body">
       <form>
         <div class="form-group row">
-          <label for="staticUsername" class="col-sm-2 col-form-label">{{$t('username')}}</label>
-          <div class="col-sm-10">
+          <label for="staticUsername" class="col-sm-4 col-form-label">{{$t('username')}}</label>
+          <div class="col-sm-8">
             <input type="text" readonly class="form-control-plaintext" id="staticUsername" v-model="username">
           </div>
         </div>
         <div class="form-group row">
-          <label for="staticEmail" class="col-sm-2 col-form-label">{{$t('email')}}</label>
-          <div class="col-sm-10">
+          <label for="staticEmail" class="col-sm-4 col-form-label">{{$t('email')}}</label>
+          <div class="col-sm-8">
             <input type="text" readonly class="form-control-plaintext" id="staticEmail" v-model="email">
           </div>
         </div>
       <div class="form-group row">
-          <label for="staticWon" class="col-sm-2 col-form-label">{{$t('total_won')}}</label>
-          <div class="col-sm-10">
+          <label for="staticWon" class="col-sm-4 col-form-label">{{$t('total_won')}}</label>
+          <div class="col-sm-8">
             <input type="number" readonly class="form-control-plaintext" id="staticWon" v-model="total_won">
           </div>
         </div>
       <div class="form-group row">
-          <label for="staticScore" class="col-sm-2 col-form-label">{{$t('total_score')}}</label>
-          <div class="col-sm-10">
+          <label for="staticScore" class="col-sm-4 col-form-label">{{$t('total_score')}}</label>
+          <div class="col-sm-8">
             <input type="number" readonly class="form-control-plaintext" id="staticScore" v-model="total_score">
           </div>
         </div>

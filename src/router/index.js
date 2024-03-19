@@ -51,7 +51,7 @@ router.beforeEach((to, from, next) => {
   } else if (sessionStorage.getItem('authToken') !== null || to.path === '/auth' || to.path === '/test') {
     next()
   } else {
-    next('/auth')
+    next('/auth?from=' + to.path)
   }
 })
 

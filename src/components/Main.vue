@@ -2,34 +2,34 @@
   <div class="container my-auto">
     <div class="row">
       <div class="col-md">
-    <div class="card text-white bg-primary mt-2">
-      <div class="card-header text-left">
-        {{$t('start.new_game_title')}}
-      </div>
-      <div class="card-body text-left">
-        <p class="card-text">{{$t('start.new_game_body')}}</p>
-        <form @submit.prevent="startGame" class="form-group">
-          <select v-model="game_lang" class="form-control form-control-lg">
-            <option v-for="(lang, i) in langs" :key="`loc${i}`" :value="lang">{{$t("loc."+lang)}}</option>
-          </select>
-          <button class="btn btn-outline-light btn-lg btn-block mt-2">{{$t('start.btn')}}</button>
-        </form>
-      </div>
-    </div>
+        <div class="card text-white bg-primary mt-2">
+          <div class="card-header text-left">
+            {{$t('start.new_game_title')}}
+          </div>
+          <div class="card-body text-left">
+            <p class="card-text">{{$t('start.new_game_body')}}</p>
+            <form @submit.prevent="startGame" class="form-group">
+              <select v-model="game_lang" class="form-control form-control-lg">
+                <option v-for="(lang, i) in langs" :key="`loc${i}`" :value="lang">{{$t("loc."+lang)}}</option>
+              </select>
+              <button class="btn btn-outline-light btn-lg btn-block mt-2">{{$t('start.btn')}}</button>
+            </form>
+          </div>
+        </div>
       </div>
       <div class="col-md">
-    <div class="card text-white bg-success mt-2">
-      <div class="card-header text-left">
-        {{$t('controller.connect_title')}}
-      </div>
-      <div class="card-body text-left">
-        <p class="card-text">{{$t('controller.connect_body')}}</p>
-        <form @submit.prevent="startController" class="form-group">
-          <input pattern=".{4}" required :title="$t('code.length')" v-model="code" class="form-control form-control-lg" type="text" :placeholder="$t('controller.code')" />
-          <button class="btn btn-outline-light btn-lg btn-block mt-2">{{$t('controller.join')}}</button>
-        </form>
-      </div>
-    </div>
+        <div class="card text-white bg-success mt-2">
+          <div class="card-header text-left">
+            {{$t('controller.connect_title')}}
+          </div>
+          <div class="card-body text-left">
+            <p class="card-text">{{$t('controller.connect_body')}}</p>
+            <form @submit.prevent="startController" class="form-group">
+              <input pattern=".{4}" required :title="$t('code.length')" v-model="code" class="form-control form-control-lg" type="text" :placeholder="$t('controller.code')" />
+              <button class="btn btn-outline-light btn-lg btn-block mt-2">{{$t('controller.join')}}</button>
+            </form>
+          </div>
+        </div>
       </div>
     </div>
   </div>

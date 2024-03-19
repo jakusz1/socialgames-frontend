@@ -1,6 +1,6 @@
 {
     "app":{
-        "name":"SocialGames EN"
+        "name":"TrendsGame"
     },
     "sign":{
         "up":"Sign up",
@@ -29,8 +29,10 @@
         "error":"Game with provided code does not exist"
     },
     "waiting":{
-        "title":"Waiting for game to start",
-        "players":"Connected players"
+        "title":"Type the code to join",
+        "open":"Scan QR code",
+        "players":"Connected players",
+        "or": "or"
     },
     "username":"Username",
     "password":"Password",
