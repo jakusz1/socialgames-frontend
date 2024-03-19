@@ -2,48 +2,88 @@
 /* eslint-disable */
 import { Line } from 'vue-chartjs'
 import moment from 'moment'
+import Vue from 'vue'
+
 
 export default {
   extends: Line,
   props: {
-    chartdata: {default: null},
-    options: {default: null}
+    chartdata: { default: null },
+    options: { default: null },
+    cssClasses: { default: "chart"}
   },
-  data () {
+  data() {
     return {
       isScreen: false,
       isChart: true
     }
   },
-  mounted () {
+  mounted() {
+
     if (this.chartdata && typeof this.chartdata.columns !== 'undefined') {
       this.noData = false;
       const data = this.chartdata;
       const playersCount = data.columns.length;
-      const datasets = prepareDatasets(data, playersCount, this.gradient);
-      const labels = data.index.map(function(e) {
-        return moment(new Date(e).toString()).format("MM/DD/YYYY")
-      });
+      const datasets = prepareDatasets(data, playersCount);
+      const labels = data.index;
       const x = {
         labels: labels,
         datasets: datasets
       }
-      this.renderChart(x, this.options)
+      this.renderChart(x, {
+        responsive: true,
+        maintainAspectRatio: false,
+        layout: {
+            padding: {
+                top: 10,
+                right: 30,
+                left: 60
+            }
+        },
+        scales: {
+          xAxes: [{
+            type: 'time',
+            time: {
+                    unit: 'quarter'
+                },
+            ticks: {
+              fontSize: 35,
+              fontFamily: 'KoHo',
+            },
+            gridLines: {
+              display: false
+            }
+          }],
+          yAxes: [{
+            display: false,
+            gridLines: {
+              display: true
+            }
+          }]
+        },
+        legend: {
+          display: false
+        }
+      })
     }
   }
 }
-const colors = ['#007bff', '#6f42c1', '#fd7e14', '#28a745', '#17a2b8'];
 
-function prepareDatasets(djangoDataset, playersCount, gradient) {
+function prepareDatasets(djangoDataset, playersCount) {
   const datasets = [];
-  for(let i = 0; i < playersCount; i++) {
-    let values = djangoDataset.data.map(function(el) { return el[i] });
+  for (let i = 0; i < playersCount; i++) {
+    let values = djangoDataset.data.map(function (el) { return el[i] });
     let dataset = {
       label: djangoDataset.columns[i],
-      borderColor: colors[i],
-      borderWidth: 3,
-      pointRadius: 0,
-      data: values
+      borderColor: Vue.prototype.$colors[i],
+      backgroundColor: Vue.prototype.$colors[i] + '33',
+      borderWidth: 5,
+      pointBackgroundColor: Vue.prototype.$colors[i],
+      pointRadius: function(context) {
+        var index = context.dataIndex;
+        return index === values.length-1 ? 12 : 0;
+      },
+      data: values,
     };
     datasets.push(dataset);
   }
@@ -52,4 +92,7 @@ function prepareDatasets(djangoDataset, playersCount, gradient) {
 </script>
 
 <style>
+.chart {
+  height: 75vh;
+}
 </style>

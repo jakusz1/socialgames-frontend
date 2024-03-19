@@ -26,7 +26,7 @@
           <div class="tab-pane fade" id="signup" role="tabpanel" aria-labelledby="signin-tab">
             <form @submit.prevent="signUp">
               <div class="form-group">
-                <input v-model="email" type="email" class="form-control" :placeholder="$t('email')" required>
+                <input v-model="email" type="email" class="form-control" :placeholder="$t('email')">
               </div>
               <div class="form-row">
                 <div class="form-group col-md-6">
@@ -72,7 +72,7 @@ export default {
       $.post(`http://${this.$backend}/auth/token/login/`, credentials, (data) => {
         sessionStorage.setItem('authToken', data.auth_token)
         sessionStorage.setItem('username', this.username)
-        this.$router.push('/')
+        this.$router.push(this.$route.query.from ? this.$route.query.from : '/')
       })
         .fail((response) => {
           alert(this.$t('log.error'))

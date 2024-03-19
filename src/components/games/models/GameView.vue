@@ -2,13 +2,15 @@
 import Screen from './Screen.vue'
 import Chart from './Chart.vue'
 import AnswerList from './AnswerList.vue'
+import ScoreTable from './ScoreTable.vue'
 
 export default {
   name: 'GameView',
   components: {
     Screen,
     Chart,
-    'answerlist': AnswerList
+    'answerlist': AnswerList,
+    ScoreTable
   },
   data: function () {
     return {
@@ -53,7 +55,7 @@ export default {
         this.currentScreenIndex++
       }
     },
-    between: function (from, to) {
+    between: function (from = 0, to = Number.MAX_VALUE) {
       return this.currentScreen && this.currentScreen.screenTimer >= from && this.currentScreen.screenTimer <= to
     },
     timer: function () {

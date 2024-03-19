@@ -1,6 +1,6 @@
 {
     "app":{
-        "name":"SocialGames PL"
+        "name":"TrendsGame"
     },
     "sign":{
         "up":"Zarejestruj się",
@@ -18,20 +18,27 @@
     "start":{
         "game":"Wystartuj grę",
         "new_game_title":"Rozpocznij nową grę",
+        "new_game_body":"Wybierz region wyszukiwań:",
         "btn":"Start"
     },
     "controller":{
         "connect_title":"Dołącz do istniejącej gry",
+        "connect_body":"Wpisz 4 znakowy kod istniejącej gry:",
         "join":"Dołącz",
-        "code":"kod gry"
+        "code":"kod gry",
+        "error":"Gra o podanym kodzie nie istnieje"
     },
     "waiting":{
-        "title":"Oczekiwanie na rozpoczęcie gry",
-        "players":"Połączeni gracze"
+        "title":"Wpisz kod gry",
+        "open":"Zeskanuj",
+        "players":"Połączeni gracze",
+        "or": "lub"
     },
     "username":"Nazwa użytkownika",
     "password":"Hasło",
-    "email":"Adres Email",
+    "email":"Email (nieobowiązkowy)",
+    "total_won": "Wygranych gier",
+    "total_score": "Całkowity wynik",
     "send":"Wyślij",
     "hello":"Witaj",
     "_code":"kod",
@@ -45,15 +52,19 @@
             "title":"Zasady",
             "text":"Stwórz najczęściej wyszukiwaną frazę z podanym słowem!"
         },
+        "round": "Runda ",
+        "multiplier1": "Teraz punkty są podwojone!",
+        "multiplier2": "Teraz punkty są potrojone!",
         "rd4q": "Przygotuj się na słowo numer {0}!"
     },
     "winner": " wygrał!",
     "code":{
         "length":"Kod ma 4 litery"
     },
-    "total":{
-        "score":"Całkowity wynik",
-        "won":"Wygranych"
+    "skip_screen": "Przewiń >",
+    "score":{
+        "round":"Aktualne wyniki",
+        "final":"Końcowe wyniki"
     },
     "profile":{
         "header":"Twój profil",
