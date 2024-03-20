@@ -76,6 +76,11 @@ export default {
     })
     this.joinGameSession()
   },
+
+  beforeDestroy () {
+    this.websocket.close()
+  },
+
   methods: {
     joinGameSession () {
       const uri = this.$route.params.uri

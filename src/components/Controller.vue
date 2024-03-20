@@ -57,6 +57,7 @@ export default {
       gameType: '',
       game: '',
       current_player: null,
+      websocket: null,
       players: []
     }
   },
@@ -72,6 +73,10 @@ export default {
       this.joinGameSession()
       this.connectToWebSocket()
     }
+  },
+
+  beforeDestroy () {
+    this.websocket.close()
   },
 
   methods: {
@@ -141,11 +146,11 @@ export default {
 
     connectToWebSocket () {
       if (this.$route.params.uri) {
-        const websocket = new WebSocket(`ws://${this.$backend}/ws/controllers/${this.$route.params.uri}`)
-        websocket.onopen = this.onOpen
-        websocket.onclose = this.onClose
-        websocket.onmessage = this.onMessage
-        websocket.onerror = this.onError
+        this.websocket = new WebSocket(`ws://${this.$backend}/ws/controllers/${this.$route.params.uri}`)
+        this.websocket.onopen = this.onOpen
+        this.websocket.onclose = this.onClose
+        this.websocket.onmessage = this.onMessage
+        this.websocket.onerror = this.onError
       }
     },
 
