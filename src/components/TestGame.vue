@@ -8,7 +8,8 @@
         <h1 v-bind:style="{ color: $colors[index] }">{{player.username}}</h1>
       </div>
       <div :key=111111 class="ml-auto align-self-center">
-        <button type="button" class="btn btn-outline-secondary btn-lg" @click='pause_step()'>►❚❚</button>
+        <button type="button" class="btn btn-secondary btn-lg" v-bind:class="{ 'btn-outline-secondary': music_paused }" @click='music()'>𝄞</button>
+        <button type="button" class="btn btn-secondary btn-lg" v-bind:class="{ 'btn-outline-secondary': !screen_paused }" @click='pause_step()'>►❚❚</button>
         <button type="button" style="margin-right: 1vw;" class="btn btn-outline-secondary btn-lg" @click='skip_current_step()'>►►</button>
       </div>
     </transition-group>
@@ -18,6 +19,7 @@
 <script>
 import TestTrendsGame from './games/TestTrendsGame.vue'
 import TrendsGame from './games/TrendsGame.vue'
+import background from '../assets/background.mp3'
 const $ = window.jQuery
 
 export default {
@@ -38,7 +40,10 @@ export default {
       websocket: null,
       code: '',
       langs: ['pl_PL', 'en_US'],
-      game_lang: 'pl_PL'
+      game_lang: 'pl_PL',
+      music_paused: true,
+      audio: new Audio(background),
+      screen_paused: false
     }
   },
 
@@ -135,12 +140,24 @@ export default {
 
     skip_current_step () {
       this.$refs.gameView.currentScreen.forward()
-      alert('essa')
     },
 
     pause_step () {
-      this.$refs.gameView.currentScreen.switch_pause()
+      // this.$refs.gameView.currentScreen.switch_pause()
+      this.screen_paused = !this.screen_paused
+    },
+
+    music () {
+      this.audio.loop = true
+      if (this.music_paused) {
+        this.audio.play()
+        this.music_paused = false
+      } else {
+        this.audio.pause()
+        this.music_paused = true
+      }
     }
+
   }
 }
 </script>
@@ -152,7 +169,6 @@ form input[type="text"] {
 .text-5{
   font-size: 5vh;
 }
-@import url('https://fonts.googleapis.com/css?family=Indie+Flower|KoHo:600');
 div {
   font-family: 'KoHo', sans-serif;
 }

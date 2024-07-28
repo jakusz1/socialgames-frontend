@@ -10,7 +10,7 @@
             <div class="card-footer">
             <h2>{{$t('waiting.players')}}</h2>
             <div v-for="player in players" :key="player.id" class="col-sm">
-              <a data-toggle="tooltip" data-html="true" :title="'<p><b>'+player.email+'</b></p><p>'+$t('total_score')+': '+player.total_score+'</p><p>'+$t('total_won')+': '+player.total_won+'</p>'" data-placement="bottom" v-bind:style="{ color: $colors[player.color] }">{{player.username}}</a>
+              <a data-toggle="tooltip" data-html="true" :title="'<p><b>'+player.email+'</b></p><p>'+$t('total_score')+': '+player.total_score+'</p><p>'+$t('total_won')+': '+player.total_won+'</p>'" data-placement="bottom" v-bind:style="{ color: $colors[player.color] }">⬢ {{player.username}}</a>
             </div>
             </div>
           </div>
@@ -31,8 +31,8 @@
       </div>
     </div>
     <div v-if="current_player" class="row">
-      <div class="col-sm text-5" v-bind:style="{ 'background-color': $colors[current_player.color] }">
-        <h1 style="color: white;">{{current_player.username}}</h1>
+      <div class="col-sm text-5 current-player" v-bind:style="{ 'background-color': $colors[current_player.color] }">
+        <h1 style="color: white;">⬢ {{current_player.username}}</h1>
       </div>
     </div>
   </div>
@@ -202,5 +202,7 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-
+.current-player {
+  font-family: 'KoHo', sans-serif;
+}
 </style>

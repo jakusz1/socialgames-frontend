@@ -25,7 +25,7 @@
           <h4 :key=2 v-if="between(5,26)">{{ $t('type_dev') }}</h4>
           <h4 :key=3 v-if="between(51,61)">{{ $t('hurry') }}</h4>
         </screen>
-        <screen :key="`${multiplier}${index}3`" :duration="10" :onStartFun="endRound">
+        <screen :key="`${multiplier}${index}3`" :duration="3" :onStartFun="endRound">
           <h2 :key=0>{{ $t('endans') }}</h2>
         </screen>
         <screen :key="`${multiplier}${index}4`" :duration="20" :onStartFun="update_new_players">
@@ -100,7 +100,6 @@ export default {
 </script>
 
 <style scoped>
-@import url('https://fonts.googleapis.com/css?family=Indie+Flower|KoHo:600');
 h1 {
   font-size: 16vh;
 }

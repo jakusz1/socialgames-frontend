@@ -34,7 +34,6 @@ export default {
 </script>
 
 <style scoped>
-@import url('https://fonts.googleapis.com/css?family=Indie+Flower|KoHo:600');
 h1 {
   font-size: 16vh;
 }

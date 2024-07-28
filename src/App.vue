@@ -5,7 +5,7 @@
         <img src="@/assets/logo.png" width="45" height="30" class="d-inline-block align-top" alt="">
         {{$t('app.name')}}
       </a>
-      <a v-if="getToken()" class="btn btn-link my-2 my-sm-0" href="#/profile">{{getUsername()}}</a>
+      <a v-if="getToken()" class="btn btn-link my-2 my-sm-0" href="#/profile">⬢ {{getUsername()}}</a>
       <LocaleChanger/>
       <a v-if="getToken()" class="btn btn-outline-success my-2 my-sm-0" href="#/logout">{{$t('log.out')}}</a>
     </nav>
@@ -38,6 +38,7 @@ export default {
 </script>
 
 <style>
+@import url('https://fonts.googleapis.com/css?family=Indie+Flower|KoHo:600');
 #app {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;

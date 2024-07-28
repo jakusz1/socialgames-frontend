@@ -6,7 +6,7 @@
     <div v-else-if="mode == 'wait_for_start'" class="container my-auto">
       <div class="card-deck">
           <div class="card bg-light">
-            <div class="card-header text-left">
+            <div class="card-header">
               <h1>{{ $t('waiting.open') }}</h1>
             </div>
             <div class="card-body">
@@ -15,25 +15,26 @@
           </div>
           <div class="card border-0">
             <div class="my-auto">
-              <a style="font-size: 8vh;"> {{ $t('waiting.or') }} </a>
+              <a style="font-size: 6rem;"> {{ $t('waiting.or') }} </a>
             </div>
           </div>
           <div class="card bg-light">
-            <div class="card-header text-left">
+            <div class="card-header">
               <h1>{{ $t('waiting.title') }}</h1>
             </div>
             <div class="card-body">
-              <a style="font-size: 12vh;"> {{ this.$route.params.uri }} </a>
+              <a style="font-size: 8rem;"> {{ this.$route.params.uri }} </a>
             </div>
         </div>
       </div>
     </div>
     <transition-group name="flip-list" tag="div" class="row">
       <div v-for="(player, index) in players" :key="player.id" class="col-sm text-5">
-        <h1 v-bind:style="{ color: $colors[index] }">{{player.username}}</h1>
+        <h1 v-bind:style="{ color: $colors[index] }">⬢ {{player.username}}</h1>
       </div>
       <div v-if="mode == 'game'" :key=111111 class="ml-auto align-self-center">
-        <button type="button" class="btn btn-outline-secondary btn-lg" @click='pause_step()'>►❚❚</button>
+        <button type="button" class="btn btn-secondary btn-lg" v-bind:class="{ 'btn-outline-secondary': music_paused }" @click='music()'>𝄞</button>
+        <button type="button" class="btn btn-secondary btn-lg" v-bind:class="{ 'btn-outline-secondary': !screen_paused }" @click='pause_step()'>►❚❚</button>
         <button type="button" style="margin-right: 1vw;" class="btn btn-outline-secondary btn-lg" @click='skip_current_step()'>►►</button>
       </div>
     </transition-group>
@@ -43,6 +44,7 @@
 <script>
 import TrendsGame from './games/TrendsGame.vue'
 import QrcodeVue from 'qrcode.vue'
+import background from '../assets/background.mp3'
 const $ = window.jQuery
 
 export default {
@@ -63,7 +65,10 @@ export default {
       code: '',
       langs: ['pl_PL', 'en_US'],
       game_lang: 'pl_PL',
-      joinUrl: window.location.href.replace('games', 'controllers')
+      joinUrl: window.location.href.replace('games', 'controllers'),
+      music_paused: true,
+      audio: new Audio(background),
+      screen_paused: false
     }
   },
 
@@ -171,6 +176,18 @@ export default {
 
     pause_step () {
       this.$refs.gameView.currentScreen.switch_pause()
+      this.screen_paused = !this.screen_paused
+    },
+
+    music () {
+      this.audio.loop = true
+      if (this.music_paused) {
+        this.audio.play()
+        this.music_paused = false
+      } else {
+        this.audio.pause()
+        this.music_paused = true
+      }
     }
   }
 }
@@ -183,7 +200,6 @@ form input[type="text"] {
 .text-5{
   font-size: 5vh;
 }
-@import url('https://fonts.googleapis.com/css?family=Indie+Flower|KoHo:600');
 div {
   font-family: 'KoHo', sans-serif;
 }
